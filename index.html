@@ -98,16 +98,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 }
 
 /* ── FLOAT BUDGET ── */
-#floatBudget{
-  position:fixed;bottom:1.25rem;left:1.25rem;z-index:150;
-  background:rgba(6,9,15,0.92);border:0.5px solid var(--border2);
-  border-radius:var(--r2);padding:.9rem 1.15rem;backdrop-filter:blur(20px);
-  cursor:default;transition:all .3s ease;min-width:185px;
-}
-#floatBudget:hover{border-color:var(--gold);transform:translateY(-2px)}
-.fb-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:.2rem}
-.fb-val{font-family:'DM Mono',monospace;font-size:1rem;color:var(--gold2)}
-.fb-sub{font-size:10px;color:var(--text3);margin-top:.2rem}
 
 /* ── PAGES ── */
 .page{display:none;min-height:100vh;position:relative;z-index:10}
@@ -504,7 +494,7 @@ section{position:relative;z-index:10}
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
   #dotNav{display:none}
-  #floatBudget{bottom:.75rem;left:.75rem;right:.75rem;min-width:unset}
+
   .img-row.cols3{grid-template-columns:1fr 1fr}
   .hero-stats{gap:1.5rem}
   /* extra nav breathing room on small phones */
@@ -542,11 +532,6 @@ section{position:relative;z-index:10}
 </nav>
 
 <!-- FLOAT BUDGET -->
-<div id="floatBudget">
-  <div class="fb-label">💰 Orçamento / pessoa</div>
-  <div class="fb-val">R$ 3.200 – 4.900</div>
-  <div class="fb-sub">7 noites · 6 amigos · sem passagens</div>
-</div>
 
 <!-- ████████████████████  PAGE: HOME  ████████████████████ -->
 <div class="page active" id="p-home">
