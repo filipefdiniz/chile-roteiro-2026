@@ -352,7 +352,27 @@ section{position:relative;z-index:10}
 .viajante-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:0.5px solid var(--border);font-size:.8rem}
 .viajante-row:last-child{border-bottom:none}
 .viajante-key{color:var(--text3)}
-.viajante-val{color:var(--text2);font-family:'DM Mono',monospace;font-size:.75rem;text-align:right}
+.viajante-val{
+  color:var(--text2);font-family:'DM Mono',monospace;font-size:.75rem;text-align:right;
+  cursor:pointer;border-radius:4px;padding:.1rem .3rem;margin-right:-.3rem;
+  transition:background .15s,color .15s;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  display:inline-flex;align-items:center;gap:.35rem;
+}
+.viajante-val::after{content:'⎘';font-size:.6rem;opacity:0;transition:opacity .18s;color:var(--accent)}
+.viajante-val:hover{background:var(--accent3);color:var(--accent2)}
+.viajante-val:hover::after{opacity:1}
+.viajante-val:active{background:rgba(61,142,240,.25)}
+/* toast */
+#copy-toast{
+  position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%) translateY(8px);
+  background:rgba(6,9,15,.95);border:0.5px solid rgba(61,142,240,.4);
+  color:var(--accent2);padding:.5rem 1.3rem;border-radius:2rem;
+  font-size:.78rem;font-family:'DM Mono',monospace;letter-spacing:.04em;
+  opacity:0;transition:opacity .22s ease,transform .22s ease;z-index:999;
+  pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px);
+}
+#copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── VOO CARD ── */
 .voo-card{
@@ -507,6 +527,7 @@ section{position:relative;z-index:10}
 <div id="prog"></div>
 <canvas id="starCanvas"></canvas>
 <canvas id="snowCanvas"></canvas>
+<div id="copy-toast">✓ Copiado!</div>
 
 <!-- TOP NAV TABS -->
 <nav id="topNav" aria-label="Seções da viagem">
@@ -1898,6 +1919,32 @@ function animPlane(){
   setTimeout(()=>requestAnimationFrame(step),1500);
 }
 animPlane();
+
+/* ── COPY ON CLICK ── */
+(function(){
+  const toast=document.getElementById('copy-toast');
+  let timer;
+  function showToast(txt){
+    toast.textContent='✓ '+txt;
+    toast.classList.add('show');
+    clearTimeout(timer);
+    timer=setTimeout(()=>toast.classList.remove('show'),2000);
+  }
+  document.querySelectorAll('.viajante-val').forEach(el=>{
+    el.addEventListener('click',function(){
+      const txt=this.textContent.replace('⎘','').trim();
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(txt).then(()=>showToast(txt));
+      } else {
+        const ta=document.createElement('textarea');
+        ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();
+        document.execCommand('copy');document.body.removeChild(ta);
+        showToast(txt);
+      }
+    });
+  });
+})();
 
 /* ── COUNTDOWN ── */
 (function countdown(){
