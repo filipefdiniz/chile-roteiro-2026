@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chile 2026 · Grupo de 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06090f;--bg2:#0a0f1a;--bg3:#0d1424;
+  --surface:rgba(255,255,255,0.035);--surface2:rgba(255,255,255,0.07);--surface3:rgba(255,255,255,0.12);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);--border3:rgba(255,255,255,0.22);
+  --text:#e2e8f5;--text2:#8a9bb8;--text3:#4a5f7a;
+  --accent:#3d8ef0;--accent2:#6fb3ff;--accent3:rgba(61,142,240,0.15);
+  --gold:#c4923a;--gold2:#e8bf7a;--gold3:rgba(196,146,58,0.12);
+  --purple:#8b5cf6;--purple2:#c084fc;--purple3:rgba(139,92,246,0.12);
+  --red:#ef4444;--red2:#fca5a5;--red3:rgba(239,68,68,0.1);
+  --green:#22c55e;--green2:#86efac;
+  --r:0.6rem;--r2:1rem;--r3:1.5rem;
+  --night-grad:linear-gradient(135deg,rgba(30,10,60,0.6),rgba(6,9,15,0.8));
+  --snow-grad:linear-gradient(135deg,rgba(20,40,90,0.6),rgba(6,9,15,0.8));
+  --sunset-grad:linear-gradient(135deg,rgba(60,25,5,0.6),rgba(6,9,15,0.8));
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.7}
+
+/* ── CANVAS ── */
+#starCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.45}
+#snowCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 2s ease}
+#snowCanvas.on{opacity:0.55}
+
+/* ── PROGRESS ── */
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--gold));z-index:300;width:0;transition:width .08s linear}
+
+/* ── TOP NAV (TABS) ── */
+#topNav{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  z-index:200;display:flex;gap:.3rem;
+  background:rgba(6,9,15,0.85);backdrop-filter:blur(20px);
+  border:0.5px solid var(--border2);border-top:none;
+  border-radius:0 0 var(--r3) var(--r3);
+  padding:.5rem .75rem;
+}
+.tab-btn{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:.45rem 1.1rem;border-radius:var(--r2);border:none;cursor:pointer;
+  background:transparent;color:var(--text3);transition:all .25s ease;white-space:nowrap;
+}
+.tab-btn:hover{color:var(--text2);background:var(--surface)}
+.tab-btn.active{background:var(--accent3);color:var(--accent2);border:0.5px solid rgba(61,142,240,0.3)}
+
+/* ── SIDE DOT NAV ── */
+#dotNav{
+  position:fixed;right:1.25rem;top:50%;transform:translateY(-50%);
+  z-index:150;display:flex;flex-direction:column;gap:.55rem;align-items:flex-end;
+}
+.dot-wrap{display:flex;align-items:center;gap:.5rem;cursor:pointer;text-decoration:none}
+.dot-label{
+  font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);opacity:0;transform:translateX(6px);transition:all .25s ease;
+  background:rgba(6,9,15,0.92);padding:3px 8px;border-radius:4px;
+  border:0.5px solid var(--border2);white-space:nowrap;pointer-events:none;
+}
+.dot-wrap:hover .dot-label,.dot-wrap.active .dot-label{opacity:1;transform:translateX(0)}
+.dot-pip{
+  width:5px;height:5px;border-radius:50%;background:var(--text3);
+  transition:all .25s ease;flex-shrink:0;
+}
+.dot-wrap:hover .dot-pip,.dot-wrap.active .dot-pip{
+  background:var(--accent);width:7px;height:7px;box-shadow:0 0 6px var(--accent);
+}
+
+/* ── FLOAT BUDGET ── */
+#floatBudget{
+  position:fixed;bottom:1.25rem;left:1.25rem;z-index:150;
+  background:rgba(6,9,15,0.92);border:0.5px solid var(--border2);
+  border-radius:var(--r2);padding:.9rem 1.15rem;backdrop-filter:blur(20px);
+  cursor:default;transition:all .3s ease;min-width:185px;
+}
+#floatBudget:hover{border-color:var(--gold);transform:translateY(-2px)}
+.fb-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:.2rem}
+.fb-val{font-family:'DM Mono',monospace;font-size:1rem;color:var(--gold2)}
+.fb-sub{font-size:10px;color:var(--text3);margin-top:.2rem}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;position:relative;z-index:10}
+.page.active{display:block}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:10}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:6rem 2rem 4rem;overflow:hidden;
+}
+.hero-kicker{
+  font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:1.5rem;opacity:0;animation:fadeUp .9s ease .4s forwards;
+}
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,9vw,8rem);font-weight:900;line-height:.95;
+  margin-bottom:1.25rem;opacity:0;animation:fadeUp 1.1s ease .6s forwards;
+  background:linear-gradient(160deg,#fff 0%,#aac8f0 45%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:1.05rem;color:var(--text2);margin-bottom:3rem;max-width:500px;
+  opacity:0;animation:fadeUp .9s ease .8s forwards;
+}
+.hero-stats{
+  display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .9s ease 1s forwards;
+}
+.hstat-num{
+  font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:700;
+  color:var(--accent2);display:block;line-height:1;
+}
+.hstat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem;display:block}
+.scroll-cue{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  color:var(--text3);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  opacity:0;animation:fadeUp .8s ease 2s forwards;
+}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,transparent,var(--accent));animation:pulse 2s ease-in-out infinite}
+
+/* ── MOUNTAINS SVG ── */
+.hero-mtn{position:absolute;bottom:0;left:0;right:0;height:45vh;pointer-events:none}
+
+/* ── SECTION WRAPPER ── */
+.sec{padding:6rem 2rem;max-width:960px;margin:0 auto}
+.sec-sm{padding:4rem 2rem;max-width:960px;margin:0 auto}
+
+/* ── LABELS / TITLES ── */
+.sec-label{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.15;margin-bottom:.75rem}
+.sec-sub{color:var(--text2);max-width:560px;margin-bottom:2.5rem;font-size:.95rem}
+
+/* ── DIVIDERS ── */
+.div-line{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0}
+.div-dot{text-align:center;padding:1.5rem 0;color:var(--text3);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase}
+
+/* ── DAY HEADER ── */
+.day-hdr{max-width:960px;margin:0 auto 3rem;padding:0 2rem}
+.day-num{
+  font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem;
+}
+.day-num::before{content:'';width:28px;height:1px;background:var(--accent);display:block}
+.day-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5vw,4.2rem);font-weight:900;line-height:1.05;margin-bottom:.6rem}
+.day-date{font-size:.8rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:1.5rem}
+.tag-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.5rem}
+.tag{font-size:10px;padding:3px 11px;border-radius:100px;border:0.5px solid var(--border2);color:var(--text2);letter-spacing:.04em}
+.tag.a{border-color:rgba(61,142,240,.4);color:var(--accent2);background:var(--accent3)}
+.tag.g{border-color:rgba(196,146,58,.4);color:var(--gold2);background:var(--gold3)}
+.tag.p{border-color:rgba(139,92,246,.4);color:var(--purple2);background:var(--purple3)}
+.tag.r{border-color:rgba(239,68,68,.35);color:var(--red2);background:var(--red3)}
+
+/* ── IMAGE PLACEHOLDER ── */
+.img-ph{
+  width:100%;border-radius:var(--r2);overflow:hidden;
+  background:var(--surface2);border:0.5px solid var(--border);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.5rem;color:var(--text3);font-size:.8rem;
+}
+.img-ph::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(61,142,240,.05),rgba(196,146,58,.05));
+}
+.img-ph-icon{font-size:2rem;position:relative;z-index:1}
+.img-ph-label{position:relative;z-index:1;text-align:center;font-size:.78rem;color:var(--text3);letter-spacing:.05em}
+.img-ph-hint{position:relative;z-index:1;font-size:.68rem;color:var(--text3);opacity:.6}
+.img-ph img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:block}
+
+/* ── CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.85rem;margin-bottom:1.5rem}
+.card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);
+  padding:1.35rem;transition:all .3s ease;position:relative;overflow:hidden;
+}
+.card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0;transition:opacity .3s ease;
+}
+.card:hover{border-color:var(--border2);background:var(--surface2);transform:translateY(-2px)}
+.card:hover::after{opacity:1}
+.card-ico{font-size:1.3rem;margin-bottom:.6rem}
+.card-title{font-weight:600;font-size:.9rem;margin-bottom:.35rem}
+.card-desc{font-size:.82rem;color:var(--text2);line-height:1.55}
+
+/* ── TIMELINE ── */
+.tl{max-width:660px;margin:0 auto;position:relative;padding-left:1.75rem}
+.tl::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--accent),transparent)}
+.tl-item{position:relative;margin-bottom:1.1rem;padding-left:1.25rem}
+.tl-item::before{
+  content:'';position:absolute;left:-1.4rem;top:.45rem;
+  width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);
+}
+.tl-time{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--accent);margin-bottom:.1rem}
+.tl-label{font-size:.88rem;color:var(--text);font-weight:500}
+.tl-sub{font-size:.78rem;color:var(--text3);margin-top:.1rem}
+
+/* ── COST TABLE ── */
+.cost-block{
+  max-width:660px;margin:2rem auto 0;
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);overflow:hidden;
+}
+.cost-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.8rem 1.35rem;border-bottom:0.5px solid var(--border);font-size:.87rem;
+}
+.cost-row:last-child{border-bottom:none}
+.cost-lbl{color:var(--text2)}
+.cost-val{font-family:'DM Mono',monospace;color:var(--gold2);font-size:.82rem}
+.cost-total{background:var(--gold3)}
+.cost-total .cost-lbl{color:var(--text);font-weight:600}
+.cost-total .cost-val{font-size:.95rem;color:var(--gold2)}
+.cost-paid{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.15) !important}
+.cost-paid .cost-lbl{color:var(--green2)}
+.cost-paid .cost-val{color:var(--green2)}
+
+/* ── OPTIONAL BOX ── */
+.opt-box{
+  max-width:660px;margin:1.5rem auto 0;
+  border:0.5px solid rgba(139,92,246,.3);border-radius:var(--r2);
+  padding:1.35rem;background:var(--purple3);position:relative;
+}
+.opt-badge{
+  position:absolute;top:-.55rem;left:1.2rem;
+  background:rgba(139,92,246,.18);border:0.5px solid rgba(139,92,246,.4);
+  color:var(--purple2);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  padding:2px 10px;border-radius:100px;
+}
+.opt-title{font-weight:600;font-size:.9rem;margin-top:.35rem;margin-bottom:.3rem}
+.opt-desc{font-size:.83rem;color:var(--text2);line-height:1.55}
+.opt-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.75rem}
+.opt-pill{display:flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--text2);background:var(--surface2);border:0.5px solid var(--border);padding:.25rem .7rem;border-radius:100px}
+
+/* ── ALTITUDE WARN ── */
+.alt-warn{
+  max-width:660px;margin:1.5rem auto 0;
+  background:var(--red3);border:0.5px solid rgba(239,68,68,.25);
+  border-radius:var(--r);padding:.9rem 1.2rem;display:flex;gap:.85rem;align-items:flex-start;
+}
+.aw-icon{font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+.aw-title{font-weight:600;font-size:.85rem;color:var(--red2);margin-bottom:.2rem}
+.aw-text{font-size:.8rem;color:var(--text2);line-height:1.5}
+
+/* ── TIP BOX ── */
+.tip{
+  max-width:660px;margin:1.25rem auto 0;
+  background:rgba(61,142,240,.05);border-left:2px solid var(--accent);
+  border-radius:0 var(--r) var(--r) 0;padding:.9rem 1.1rem;
+  font-size:.83rem;color:var(--text2);line-height:1.6;
+}
+.tip strong{color:var(--accent2)}
+
+/* ── LOCATION LIST ── */
+.loc-list{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:.4rem}
+.loc-item{
+  display:flex;align-items:center;gap:.9rem;padding:.7rem 1rem;
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);
+  font-size:.87rem;transition:all .22s ease;
+}
+.loc-item:hover{border-color:var(--border2);background:var(--surface2)}
+.loc-n{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);min-width:1.4rem}
+.loc-name{color:var(--text);flex:1}
+.loc-sub{font-size:.75rem;color:var(--text3)}
+
+/* ── INFO PILLS ROW ── */
+.info-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.5rem;max-width:660px}
+.ip{display:flex;align-items:center;gap:.35rem;font-size:.77rem;color:var(--text2);background:var(--surface);border:0.5px solid var(--border);padding:.3rem .8rem;border-radius:100px}
+
+/* ── NIGHTLIFE CARD ── */
+.night-card{
+  max-width:660px;margin:1.5rem auto 0;
+  background:linear-gradient(135deg,rgba(20,8,40,.85),rgba(6,9,15,.9));
+  border:0.5px solid rgba(192,132,252,.2);border-radius:var(--r2);padding:1.75rem;
+  position:relative;overflow:hidden;
+}
+.night-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 75% 40%,rgba(192,132,252,.07),transparent 65%);
+  pointer-events:none;
+}
+.night-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#e8d4ff;margin-bottom:.4rem}
+.night-desc{font-size:.85rem;color:rgba(232,212,255,.5);margin-bottom:1.15rem}
+.night-grid{display:flex;flex-wrap:wrap;gap:1.25rem}
+.night-item-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(232,212,255,.35);margin-bottom:.15rem}
+.night-item-val{font-size:.87rem;color:rgba(232,212,255,.8);font-weight:500}
+
+/* ── SUNSET CARD ── */
+.sunset-card{
+  max-width:660px;margin:1.5rem auto 0;
+  background:linear-gradient(135deg,rgba(35,12,3,.9),rgba(6,9,15,.95));
+  border:0.5px solid rgba(232,160,80,.25);border-radius:var(--r2);padding:1.75rem;
+  position:relative;overflow:hidden;
+}
+.sunset-card::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:55%;
+  background:radial-gradient(ellipse at 50% 100%,rgba(232,100,45,.1),transparent 70%);
+}
+.sunset-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#f0c090;margin-bottom:.4rem}
+.sunset-desc{font-size:.85rem;color:rgba(240,192,144,.55);margin-bottom:1rem;position:relative;z-index:1}
+.sunset-row{display:flex;flex-wrap:wrap;gap:1.25rem;position:relative;z-index:1}
+.sunset-item-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(240,192,144,.35);margin-bottom:.15rem}
+.sunset-item-val{font-size:.87rem;color:rgba(240,192,144,.85);font-weight:500}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-top:2.5rem}
+.stat-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center;transition:all .3s ease}
+.stat-card:hover{border-color:var(--accent);background:var(--surface2)}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+
+/* ── VIAJANTES ── */
+.viajante-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.85rem}
+.viajante-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);
+  padding:1.35rem;transition:all .3s ease;
+}
+.viajante-card:hover{border-color:var(--border2);background:var(--surface2)}
+.viajante-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--accent3);border:0.5px solid rgba(61,142,240,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:700;color:var(--accent2);font-family:'Playfair Display',serif;
+  margin-bottom:.9rem;flex-shrink:0;
+}
+.viajante-name{font-weight:600;font-size:.95rem;margin-bottom:.6rem}
+.viajante-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:0.5px solid var(--border);font-size:.8rem}
+.viajante-row:last-child{border-bottom:none}
+.viajante-key{color:var(--text3)}
+.viajante-val{color:var(--text2);font-family:'DM Mono',monospace;font-size:.75rem;text-align:right}
+
+/* ── VOO CARD ── */
+.voo-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);
+  padding:1.5rem;margin-bottom:.85rem;
+}
+.voo-route{display:flex;align-items:center;gap:1rem;margin-bottom:.9rem;flex-wrap:wrap}
+.voo-city{text-align:center}
+.voo-city-code{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--accent2)}
+.voo-city-name{font-size:.72rem;color:var(--text3)}
+.voo-arrow{flex:1;height:1px;background:linear-gradient(90deg,var(--accent),var(--gold));position:relative;min-width:40px}
+.voo-arrow::after{content:'✈';position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:.9rem;color:var(--accent2)}
+.voo-details{display:flex;flex-wrap:wrap;gap:1rem}
+.voo-detail-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.15rem}
+.voo-detail-val{font-size:.83rem;color:var(--text);font-weight:500}
+.voo-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;padding:2px 9px;border-radius:100px;margin-top:.75rem}
+.voo-badge.warn{background:rgba(251,191,36,.1);border:0.5px solid rgba(251,191,36,.3);color:#fde68a}
+.voo-badge.ok{background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.3);color:var(--green2)}
+
+/* ── CHECKLIST ── */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.45rem}
+.check-item{
+  display:flex;align-items:flex-start;gap:.7rem;padding:.65rem .9rem;
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);
+  font-size:.82rem;color:var(--text2);transition:all .2s ease;cursor:pointer;
+}
+.check-item:hover{border-color:var(--border2);background:var(--surface2)}
+.check-item.checked{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);color:var(--green2)}
+.check-num{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent);min-width:1.4rem;flex-shrink:0;margin-top:.05rem}
+.check-ico{flex-shrink:0;font-size:.95rem;margin-top:-.05rem}
+.check-box{width:14px;height:14px;border-radius:3px;border:0.5px solid var(--border2);background:transparent;flex-shrink:0;margin-top:.2rem;transition:all .2s ease;display:flex;align-items:center;justify-content:center}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green)}
+
+/* ── SEGURO TABLE ── */
+.seguro-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+.seguro-table th{text-align:left;padding:.6rem .9rem;color:var(--text3);font-weight:500;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;border-bottom:0.5px solid var(--border2)}
+.seguro-table td{padding:.65rem .9rem;border-bottom:0.5px solid var(--border);color:var(--text2);vertical-align:middle}
+.seguro-table tr:last-child td{border-bottom:none}
+.seguro-table tr:hover td{background:var(--surface2)}
+.seguro-table .price{font-family:'DM Mono',monospace;color:var(--gold2)}
+
+/* ── TRANSPORT ── */
+.transport-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);
+  padding:1.35rem;margin-bottom:.75rem;
+}
+.transport-head{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem}
+.transport-ico{font-size:1.4rem}
+.transport-name{font-weight:600;font-size:.95rem}
+.transport-badge{margin-left:auto;font-size:.68rem;padding:2px 9px;border-radius:100px}
+.transport-badge.ok{background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.3);color:var(--green2)}
+.transport-badge.warn{background:rgba(239,68,68,.1);border:0.5px solid rgba(239,68,68,.3);color:var(--red2)}
+.transport-rows{display:flex;flex-direction:column;gap:.35rem}
+.transport-row{display:flex;justify-content:space-between;font-size:.82rem;padding:.35rem 0;border-bottom:0.5px solid var(--border)}
+.transport-row:last-child{border-bottom:none}
+.transport-row-key{color:var(--text3)}
+.transport-row-val{color:var(--text2);font-family:'DM Mono',monospace;font-size:.78rem;text-align:right}
+
+/* ── HOSPEDAGEM ── */
+.hosp-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);
+  padding:1.5rem;max-width:660px;margin:0 auto;
+}
+.hosp-title{font-weight:600;font-size:1rem;margin-bottom:1rem}
+.hosp-row{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:0.5px solid var(--border);font-size:.85rem}
+.hosp-row:last-child{border-bottom:none}
+.hosp-key{color:var(--text3)}
+.hosp-val{color:var(--text2);font-family:'DM Mono',monospace;font-size:.8rem;text-align:right}
+.hosp-highlight{background:var(--gold3);border-radius:var(--r);margin-top:.75rem;padding:.85rem 1rem}
+.hosp-highlight-label{font-size:.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.hosp-highlight-val{font-size:1.1rem;color:var(--gold2);font-family:'DM Mono',monospace}
+
+/* ── CHIP CARDS ── */
+.chip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;margin-top:1rem}
+.chip-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.2rem}
+.chip-title{font-weight:600;font-size:.9rem;margin-bottom:.5rem}
+.chip-rows{display:flex;flex-direction:column;gap:.3rem}
+.chip-row{display:flex;justify-content:space-between;font-size:.8rem;padding:.25rem 0;border-bottom:0.5px solid var(--border)}
+.chip-row:last-child{border-bottom:none}
+.chip-key{color:var(--text3)}
+.chip-val{color:var(--text2);font-family:'DM Mono',monospace;font-size:.75rem}
+
+/* ── WISE STATUS ── */
+.wise-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem;margin-top:1rem}
+.wise-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem 1rem;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);
+  font-size:.85rem;
+}
+.wise-name{color:var(--text2)}
+.wise-status-ok{color:var(--green2);font-size:.75rem;font-weight:600}
+.wise-status-pend{color:#fde68a;font-size:.75rem;font-weight:600}
+
+/* ── IMAGE GALLERY ROW ── */
+.img-row{display:grid;gap:.6rem;margin:1.5rem auto;max-width:660px}
+.img-row.cols2{grid-template-columns:1fr 1fr}
+.img-row.cols3{grid-template-columns:1fr 1fr 1fr}
+.img-row.cols1{grid-template-columns:1fr}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes planeFly{0%{stroke-dashoffset:900}100%{stroke-dashoffset:0}}
+
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .75s ease,transform .75s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}.reveal.d4{transition-delay:.4s}
+
+/* ── SECTION BGs ── */
+.bg-night{background:radial-gradient(ellipse at 80% 20%,rgba(30,10,60,.35),transparent 60%)}
+.bg-city{background:radial-gradient(ellipse at 20% 60%,rgba(10,25,55,.3),transparent 60%)}
+.bg-snow{background:radial-gradient(ellipse at 50% 0%,rgba(15,35,80,.4),transparent 65%)}
+.bg-sunset{background:radial-gradient(ellipse at 60% 50%,rgba(50,18,5,.4),transparent 60%)}
+.bg-wine{background:radial-gradient(ellipse at 30% 50%,rgba(80,20,30,.3),transparent 60%)}
+.bg-end{background:radial-gradient(ellipse at 50% 100%,rgba(10,20,50,.4),transparent 60%)}
+
+/* ── ROUTE SVG ── */
+.route-wrap{max-width:680px;margin:2.5rem auto 0}
+
+/* ── CLOSING ── */
+.closing-title{
+  font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;
+  background:linear-gradient(135deg,#fff,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:1.25rem;
+}
+
+/* ── RIO / BA ROTEIRO ── */
+.roteiro-badge{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--surface2);border:0.5px solid var(--border2);
+  border-radius:var(--r);padding:.35rem .85rem;font-size:.75rem;color:var(--text2);margin-bottom:1rem;
+}
+.city-hero{
+  padding:5rem 2rem;text-align:center;
+  background:linear-gradient(to bottom,rgba(6,9,15,0),rgba(6,9,15,.8));
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  #dotNav{display:none}
+  #floatBudget{bottom:.75rem;left:.75rem;right:.75rem;min-width:unset}
+  .img-row.cols3{grid-template-columns:1fr 1fr}
+  #topNav{gap:.15rem;padding:.4rem .5rem}
+  .tab-btn{font-size:.68rem;padding:.4rem .7rem}
+  .hero-stats{gap:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<canvas id="starCanvas"></canvas>
+<canvas id="snowCanvas"></canvas>
+
+<!-- TOP NAV TABS -->
+<nav id="topNav" aria-label="Seções da viagem">
+  <button class="tab-btn active" onclick="showPage('p-home')">🏠 Início</button>
+  <button class="tab-btn" onclick="showPage('p-rio')">🏖 Rio · 06/08</button>
+  <button class="tab-btn" onclick="showPage('p-ba')">🥩 Buenos Aires · 07/08</button>
+  <button class="tab-btn" onclick="showPage('p-roteiro')">🗓 Santiago · 07–14/08</button>
+  <button class="tab-btn" onclick="showPage('p-guia')">📋 Guia</button>
+  <button class="tab-btn" onclick="showPage('p-viajantes')">👥 Grupo</button>
+</nav>
+
+<!-- SIDE DOT NAV (roteiro only) -->
+<nav id="dotNav" aria-label="Navegação por dia" style="display:none">
+  <a class="dot-wrap" href="#hero"><span class="dot-label">Início</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#chegada"><span class="dot-label">Chegada</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d1"><span class="dot-label">Sáb · City Tour</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d2"><span class="dot-label">Dom · Centro</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d3"><span class="dot-label">Seg · Valle Nevado</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d4"><span class="dot-label">Ter · MUT + Alyan</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d5"><span class="dot-label">Qua · Portillo</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d6"><span class="dot-label">Qui · Sunset 3K</span><span class="dot-pip"></span></a>
+  <a class="dot-wrap" href="#d7"><span class="dot-label">Sex · Último Dia</span><span class="dot-pip"></span></a>
+</nav>
+
+<!-- FLOAT BUDGET -->
+<div id="floatBudget">
+  <div class="fb-label">💰 Orçamento / pessoa</div>
+  <div class="fb-val">R$ 3.200 – 4.900</div>
+  <div class="fb-sub">7 noites · 6 amigos · sem passagens</div>
+</div>
+
+<!-- ████████████████████  PAGE: HOME  ████████████████████ -->
+<div class="page active" id="p-home">
+
+<section style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden">
+  <div style="font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;opacity:0;animation:fadeUp .9s ease .3s forwards">Guia Oficial da Viagem · Grupo de 6</div>
+  <h1 style="font-family:'Playfair Display',serif;font-size:clamp(3.5rem,9vw,8rem);font-weight:900;line-height:.95;margin-bottom:1rem;opacity:0;animation:fadeUp 1.1s ease .5s forwards;background:linear-gradient(160deg,#fff 0%,#aac8f0 50%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Chile<br>2026</h1>
+  <p style="font-size:1.05rem;color:var(--text2);margin-bottom:2.5rem;max-width:500px;opacity:0;animation:fadeUp .9s ease .7s forwards">Roteiro completo, guia prático e todas as informações do grupo em um só lugar. Do Rio até os Andes — 06 a 14 de agosto.</p>
+
+  <!-- COUNTDOWN -->
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem;opacity:0;animation:fadeUp .9s ease .9s forwards">
+    <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r2);padding:.9rem 1.4rem;min-width:72px">
+      <div id="cd-d" style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--accent2);line-height:1">--</div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-top:.25rem">Dias</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r2);padding:.9rem 1.4rem;min-width:72px">
+      <div id="cd-h" style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--accent2);line-height:1">--</div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-top:.25rem">Horas</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r2);padding:.9rem 1.4rem;min-width:72px">
+      <div id="cd-m" style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--accent2);line-height:1">--</div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-top:.25rem">Min</div>
+    </div>
+    <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r2);padding:.9rem 1.4rem;min-width:72px">
+      <div id="cd-s" style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--accent2);line-height:1">--</div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-top:.25rem">Seg</div>
+    </div>
+  </div>
+  <div style="font-size:.78rem;color:var(--text3);letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:fadeUp .8s ease 1.1s forwards">06 de agosto · Decolagem do Rio de Janeiro</div>
+
+  <!-- MOUNTAINS -->
+  <svg style="position:absolute;bottom:0;left:0;right:0;height:40vh;pointer-events:none" viewBox="0 0 1440 280" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="hm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity=".6"/><stop offset="100%" stop-color="#06090f" stop-opacity="1"/></linearGradient>
+    </defs>
+    <polygon points="0,280 0,170 120,110 240,155 360,70 500,130 640,35 780,100 920,25 1060,95 1200,45 1340,120 1440,75 1440,280" fill="url(#hm1)"/>
+    <polygon points="360,70 330,100 390,100" fill="white" opacity=".5"/>
+    <polygon points="640,35 600,75 680,75" fill="white" opacity=".65"/>
+    <polygon points="920,25 878,68 962,68" fill="white" opacity=".7"/>
+    <polygon points="1200,45 1165,80 1235,80" fill="white" opacity=".5"/>
+  </svg>
+</section>
+
+<!-- HOW TO USE -->
+<section style="padding:5rem 2rem 3rem;max-width:960px;margin:0 auto">
+  <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem;text-align:center">Como usar este guia</div>
+  <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;text-align:center;margin-bottom:.6rem">Tudo em 5 abas</h2>
+  <p style="color:var(--text2);text-align:center;max-width:480px;margin:0 auto 3rem;font-size:.92rem">Navegue pelo menu acima. Cada aba concentra tudo que você precisa para aquela parte da viagem — do roteiro às informações práticas.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.85rem;margin-bottom:3rem">
+
+    <div onclick="showPage('p-rio')" style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:all .3s ease" onmouseover="this.style.borderColor='rgba(111,179,255,.4)';this.style.background='var(--surface2)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)';this.style.transform='translateY(0)'">
+      <div style="font-size:1.6rem;margin-bottom:.7rem">🏖</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.25rem">Rio de Janeiro</div>
+      <div style="font-size:.73rem;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:.06em">06 / 08 / 2026</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.55">Um dia em Ipanema antes do grande voo. Roteiro do dia, dicas de praia e o lembrete das 04h para o Galeão.</div>
+    </div>
+
+    <div onclick="showPage('p-ba')" style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:all .3s ease" onmouseover="this.style.borderColor='rgba(111,179,255,.4)';this.style.background='var(--surface2)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)';this.style.transform='translateY(0)'">
+      <div style="font-size:1.6rem;margin-bottom:.7rem">🥩</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.25rem">Buenos Aires</div>
+      <div style="font-size:.73rem;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:.06em">07 / 08 / 2026</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.55">Conexão com dia livre no Aeroparque. Caminito, San Telmo, Casa Rosada, choripán e imigração argentina.</div>
+    </div>
+
+    <div onclick="showPage('p-roteiro')" style="background:var(--surface);border:0.5px solid rgba(61,142,240,.3);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:all .3s ease;background:var(--accent3)" onmouseover="this.style.borderColor='rgba(61,142,240,.6)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='rgba(61,142,240,.3)';this.style.transform='translateY(0)'">
+      <div style="font-size:1.6rem;margin-bottom:.7rem">🗓</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.25rem;color:var(--accent2)">Santiago · Chile</div>
+      <div style="font-size:.73rem;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:.06em">07 – 14 / 08 / 2026</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.55">7 noites com Valle Nevado, Portillo, Sunset Infinitum 3K, Pub Crawl, City Tour e muito mais.</div>
+    </div>
+
+    <div onclick="showPage('p-guia')" style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:all .3s ease" onmouseover="this.style.borderColor='rgba(111,179,255,.4)';this.style.background='var(--surface2)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)';this.style.transform='translateY(0)'">
+      <div style="font-size:1.6rem;margin-bottom:.7rem">📋</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.25rem">Guia Prático</div>
+      <div style="font-size:.73rem;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:.06em">Referência rápida</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.55">Voos, hospedagem, transporte, chip, Wise, seguro viagem, imigração e todas as dicas do Chile.</div>
+    </div>
+
+    <div onclick="showPage('p-viajantes')" style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.5rem;cursor:pointer;transition:all .3s ease" onmouseover="this.style.borderColor='rgba(111,179,255,.4)';this.style.background='var(--surface2)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)';this.style.transform='translateY(0)'">
+      <div style="font-size:1.6rem;margin-bottom:.7rem">👥</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.25rem">O Grupo</div>
+      <div style="font-size:.73rem;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:.6rem;letter-spacing:.06em">6 viajantes</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.55">Dados de cada viajante, contatos de emergência, Pix e checklist interativo da mala.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TRIP OVERVIEW -->
+<section style="padding:0 2rem 6rem;max-width:960px;margin:0 auto">
+  <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin-bottom:4rem"></div>
+  <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem;text-align:center">A viagem em números</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.75rem;margin-bottom:2.5rem">
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem">9</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Dias totais</span></div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem">6</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Amigos</span></div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem">3</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Cidades</span></div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem">3km</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Altitude</span></div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--gold2);display:block;margin-bottom:.2rem">R$4k</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Orçamento</span></div>
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.1rem;text-align:center"><span style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent2);display:block;margin-bottom:.2rem">∞</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Memórias</span></div>
+  </div>
+
+  <!-- ROUTE BAR -->
+  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.75rem 1.5rem">
+    <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--accent2)">BHZ</div><div style="font-size:.65rem;color:var(--text3)">Belo Horizonte</div></div>
+    <div style="color:var(--text3);font-size:.85rem">✈</div>
+    <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--accent2)">GIG</div><div style="font-size:.65rem;color:var(--text3)">Rio de Janeiro</div></div>
+    <div style="color:var(--text3);font-size:.85rem">✈</div>
+    <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--accent2)">AEP</div><div style="font-size:.65rem;color:var(--text3)">Buenos Aires</div></div>
+    <div style="color:var(--text3);font-size:.85rem">✈</div>
+    <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--gold2)">SCL</div><div style="font-size:.65rem;color:var(--text3)">Santiago · 7 noites</div></div>
+    <div style="color:var(--text3);font-size:.85rem">✈</div>
+    <div style="text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--accent2)">BHZ</div><div style="font-size:.65rem;color:var(--text3)">Volta · 14/08</div></div>
+  </div>
+</section>
+
+</div><!-- /p-home -->
+
+<!-- ████████████████████  PAGE: ROTEIRO  ████████████████████ -->
+<div class="page" id="p-roteiro">
+
+<!-- HERO -->
+<section id="hero" class="bg-snow">
+  <div class="hero-kicker">07 – 14 de agosto de 2026 · Santiago, Chile</div>
+  <h1 class="hero-title">Chile<br>2026</h1>
+  <p class="hero-sub">Neve, montanhas, nightlife e memórias inesquecíveis. 6 amigos. 7 noites.</p>
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-num" id="c-days">0</span><span class="hstat-label">Dias</span></div>
+    <div class="hstat"><span class="hstat-num" id="c-friends">0</span><span class="hstat-label">Amigos</span></div>
+    <div class="hstat"><span class="hstat-num" id="c-mtn">0</span><span class="hstat-label">Passeios neve</span></div>
+    <div class="hstat"><span class="hstat-num" id="c-alt">0</span><span class="hstat-label">m altitude máx.</span></div>
+  </div>
+  <div class="scroll-cue"><span>Role para descobrir</span><div class="scroll-line"></div></div>
+  <svg class="hero-mtn" viewBox="0 0 1440 280" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="mg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6b" stop-opacity=".75"/><stop offset="100%" stop-color="#06090f" stop-opacity="1"/></linearGradient>
+      <linearGradient id="mg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e2550" stop-opacity=".6"/><stop offset="100%" stop-color="#06090f" stop-opacity="1"/></linearGradient>
+    </defs>
+    <polygon points="0,280 0,170 120,110 240,155 360,70 500,130 640,35 780,100 920,25 1060,95 1200,45 1340,120 1440,75 1440,280" fill="url(#mg1)"/>
+    <polygon points="0,280 0,210 160,165 300,195 440,135 580,170 720,95 860,155 1000,85 1140,145 1280,105 1400,155 1440,135 1440,280" fill="url(#mg2)" opacity=".65"/>
+    <polygon points="360,70 330,100 390,100" fill="white" opacity=".65"/>
+    <polygon points="640,35 600,75 680,75" fill="white" opacity=".75"/>
+    <polygon points="920,25 878,68 962,68" fill="white" opacity=".8"/>
+    <polygon points="1200,45 1165,80 1235,80" fill="white" opacity=".6"/>
+  </svg>
+</section>
+
+<div class="div-line"></div>
+
+<!-- STATS -->
+<section class="sec-sm">
+  <div class="sec-label reveal">A viagem em números</div>
+  <div class="stat-grid reveal d1">
+    <div class="stat-card"><span class="stat-num">7</span><span class="stat-label">Noites</span></div>
+    <div class="stat-card"><span class="stat-num">6</span><span class="stat-label">Amigos</span></div>
+    <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Tours neve</span></div>
+    <div class="stat-card"><span class="stat-num">3.000m</span><span class="stat-label">Altitude máx.</span></div>
+    <div class="stat-card"><span class="stat-num">−4°C</span><span class="stat-label">Temp. mínima</span></div>
+    <div class="stat-card"><span class="stat-num">R$4k</span><span class="stat-label">Orçamento médio</span></div>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ROTA VOO OVERVIEW -->
+<section class="sec bg-city">
+  <div class="sec-label reveal">Rota de chegada</div>
+  <h2 class="sec-title reveal">BH → Rio → Buenos Aires → Santiago</h2>
+  <p class="sec-sub reveal">Saída de BH na quinta 06/08, escala no Rio, conexão em Buenos Aires, pouso em Santiago na madrugada de sexta 07/08.</p>
+  <div class="route-wrap reveal">
+    <svg viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg" aria-label="Rota BH até Santiago">
+      <defs>
+        <linearGradient id="rg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3d8ef0" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="#c4923a" stop-opacity=".85"/>
+        </linearGradient>
+      </defs>
+      <path id="rp" d="M 55,85 Q 185,25 330,60 Q 475,20 620,72" stroke="url(#rg)" stroke-width="1.5" fill="none" stroke-dasharray="900" stroke-dashoffset="900" style="animation:planeFly 3s ease 1s forwards"/>
+      <circle cx="55" cy="85" r="5" fill="#3d8ef0"/>
+      <circle cx="210" cy="48" r="4" fill="#5fa8ff"/>
+      <circle cx="430" cy="35" r="4" fill="#8dc8ff"/>
+      <circle cx="620" cy="72" r="6" fill="#c4923a"/>
+      <text x="55" y="103" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(138,155,184,.9)">BHZ</text>
+      <text x="210" y="37" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(138,155,184,.9)">GIG</text>
+      <text x="430" y="25" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(138,155,184,.9)">AEP</text>
+      <text x="620" y="92" text-anchor="middle" font-family="DM Sans" font-size="11" font-weight="600" fill="#e8bf7a">SCL</text>
+      <text id="plane-icon" x="55" y="83" font-size="13" text-anchor="middle">✈</text>
+    </svg>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── CHEGADA ── -->
+<section id="chegada" class="sec bg-city">
+  <div class="day-hdr" style="padding:0">
+    <div class="day-num reveal">Chegada · Sexta-feira, 07/08</div>
+    <h2 class="day-title reveal">"Bem-vindos a Santiago"</h2>
+    <div class="day-date reveal">Pouso · ~00h30 · Aeropuerto Arturo Merino Benítez</div>
+    <div class="tag-row reveal">
+      <span class="tag a">✈️ Chegada</span>
+      <span class="tag">🏠 Airbnb</span>
+      <span class="tag">😴 Descanso</span>
+    </div>
+  </div>
+  <div class="img-row cols2 reveal">
+    <div class="img-ph" style="height:200px">
+      <img src="https://dicaschile.com.br/wp-content/uploads/sites/13/2016/06/Santiago-Chile-noite-1024x641.png" alt="Chegada em Santiago" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:200px">
+      <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1227586538675564403/original/47be5381-20e0-41ae-8a96-b4bdd0f07d3b.jpeg?im_w=960" alt="Airbnb Providencia" loading="lazy">
+    </div>
+  </div>
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">~00h30</div><div class="tl-label">Pouso em Santiago · SCL</div><div class="tl-sub">JetSmart · voo de Buenos Aires</div></div>
+    <div class="tl-item"><div class="tl-time">~01h30</div><div class="tl-label">Transfer / Uber para o Airbnb</div><div class="tl-sub">Transvip van ou Uber · Av. Providencia 2562</div></div>
+    <div class="tl-item"><div class="tl-time">~02h30</div><div class="tl-label">Chegada e instalação</div><div class="tl-sub">2 quartos · 5 camas · 2 banheiros · Providencia</div></div>
+    <div class="tl-item"><div class="tl-time">Resto da madrugada</div><div class="tl-label">Descanso — amanhã começa cedo</div></div>
+  </div>
+  <div class="tip reveal">
+    <strong>Transfer do aeroporto:</strong> Transvip van para até 7 pessoas sai R$422 total (R$60/pessoa). Ou dois Ubers de 3–4 pessoas cada (R$132–163 por carro). Uber é mais fácil de achar indo da cidade para o aeroporto no retorno.
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 1: SÁBADO ── -->
+<section id="d1" class="sec bg-night">
+  <div class="day-num reveal">Dia 1 · Sábado, 08/08</div>
+  <h2 class="day-title reveal">"Mercado, City Tour<br>& Pub Crawl"</h2>
+  <div class="day-date reveal">Primeira manhã em Santiago</div>
+  <div class="tag-row reveal">
+    <span class="tag a">🏛 City Tour</span>
+    <span class="tag a">⛰ Cerro San Cristóbal</span>
+    <span class="tag g">🌃 Pub Crawl</span>
+    <span class="tag">🥩 Mercado</span>
+  </div>
+  <div class="info-row reveal">
+    <div class="ip">🌡 9–14°C</div>
+    <div class="ip">📍 Centro · Providencia · Bellavista</div>
+    <div class="ip">🌙 Pub Crawl à noite</div>
+  </div>
+
+  <div class="img-row cols3 reveal">
+    <div class="img-ph" style="height:170px">
+      <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/cd/a8/8f/photo2jpg.jpg?w=900&h=-1&s=1" alt="La Moneda" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://fulltour.com.br/uploads/blog/9de50419473b5c0d4e4e940f0100b315.jpg" alt="Cerro San Cristóbal" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpN5sKOyVtWNb9g_63eoSBF7c_RH6PQZ6urw&s" alt="Pub Crawl Santiago" loading="lazy">
+    </div>
+  </div>
+
+  <div class="cards reveal d1" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-ico">🥩</div>
+      <div class="card-title">Mercado Central</div>
+      <div class="card-desc">Café da manhã ou brunch no mercado mais tradicional de Santiago. Frutos do mar, culinária chilena e clima histórico. Inaugurado em 1872.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🏛</div>
+      <div class="card-title">City Tour — Centro</div>
+      <div class="card-desc">Igreja San Francisco · Bairro Paris-Londres · La Moneda · Plaza La Ciudadanía · Tribunal de Justiça · La Bolsa · Obelisco. Uma volta completa pelo coração histórico de Santiago.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">⛰</div>
+      <div class="card-title">Cerro San Cristóbal</div>
+      <div class="card-desc">O melhor mirante de Santiago — com os Andes de um lado e a cidade do outro. Suba de funicular (R$18–22) ou teleférico (R$22–27). Vista da estátua da Virgem no cume.</div>
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">09h00</div><div class="tl-label">Mercado Central — café da manhã</div><div class="tl-sub">Frutos do mar, culinária chilena, ambiente histórico</div></div>
+    <div class="tl-item"><div class="tl-time">11h00</div><div class="tl-label">City Tour a pé — Centro histórico</div><div class="tl-sub">La Moneda, Plaza La Ciudadanía, Cruzamento Agustinas/Bandera, La Bolsa</div></div>
+    <div class="tl-item"><div class="tl-time">14h00</div><div class="tl-label">Cerro San Cristóbal</div><div class="tl-sub">Funicular (Bellavista) → Cume → Teleférico (Providencia). Vista 360° de Santiago + Andes</div></div>
+    <div class="tl-item"><div class="tl-time">17h00</div><div class="tl-label">Retorno ao Airbnb — descanso</div><div class="tl-sub">Guardar energia para a noite</div></div>
+    <div class="tl-item"><div class="tl-time">20h30</div><div class="tl-label">Jantar / drinks em Bellavista</div></div>
+    <div class="tl-item"><div class="tl-time">22h00</div><div class="tl-label">Pub Crawl começa</div><div class="tl-sub">Múltiplos bares · turistas internacionais · clube final</div></div>
+    <div class="tl-item"><div class="tl-time">03h00</div><div class="tl-label">Retorno ao Airbnb</div></div>
+  </div>
+
+  <div class="night-card reveal">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+      <span style="font-size:1.4rem">🌃</span>
+      <div class="night-title">Pub Crawl Santiago</div>
+    </div>
+    <div class="night-desc">Bar hopping pelos melhores bares e boates de Santiago com turistas internacionais. Acontece somente aos sábados. A melhor forma de estrear a noite da cidade.</div>
+    <div class="night-grid">
+      <div><div class="night-item-label">Início</div><div class="night-item-val">22h00</div></div>
+      <div><div class="night-item-label">Retorno</div><div class="night-item-val">~03h00</div></div>
+      <div><div class="night-item-label">Formato</div><div class="night-item-val">Bares + clube final</div></div>
+      <div><div class="night-item-label">Valor</div><div class="night-item-val">R$ 110 / pessoa</div></div>
+    </div>
+  </div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Pub Crawl</span><span class="cost-val">R$ 110</span></div>
+    <div class="cost-row"><span class="cost-lbl">Funicular / Teleférico San Cristóbal</span><span class="cost-val">R$ 22 – 65</span></div>
+    <div class="cost-row"><span class="cost-lbl">Refeições do dia</span><span class="cost-val">R$ 60 – 100</span></div>
+    <div class="cost-row"><span class="cost-lbl">Uber / extras</span><span class="cost-val">R$ 20 – 50</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 212 – 325</span></div>
+  </div>
+  <div class="tip reveal"><strong>Dica:</strong> No Cerro San Cristóbal, suba de funicular e desça de teleférico — cada lado tem uma vista diferente. O funicular sai de Bellavista (Pío Nono) e o teleférico de Providencia (Pedro de Valdivia Norte).</div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 2: DOMINGO ── -->
+<section id="d2" class="sec bg-city">
+  <div class="day-num reveal">Dia 2 · Domingo, 09/08</div>
+  <h2 class="day-title reveal">"Centro Histórico<br>& Troca de Guardas"</h2>
+  <div class="day-date reveal">Domingo em Santiago</div>
+  <div class="tag-row reveal">
+    <span class="tag a">🏛 Centro histórico</span>
+    <span class="tag a">💂 Troca de guardas</span>
+    <span class="tag p">🎢 Fantasilandia (opcional)</span>
+  </div>
+
+  <div class="img-row cols2 reveal">
+    <div class="img-ph" style="height:190px">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4ulGwxbA_73yPQQ4WgAKzvbHw6jRu7Tirjg&s" alt="Cerro Santa Lucía" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:190px">
+      <img src="https://midias.nosnochile.com.br/wp-content/uploads/2025/02/Lastarria362-2.jpg.webp" alt="Bairro Lastarria" loading="lazy">
+    </div>
+  </div>
+
+  <div class="loc-list reveal" style="margin-top:1.5rem">
+    <div class="loc-item"><span class="loc-n">01</span><span class="loc-name">Plaza de Armas / Catedral Metropolitana</span><span class="loc-sub">Centro</span></div>
+    <div class="loc-item"><span class="loc-n">02</span><span class="loc-name">Troca de Guardas — La Moneda</span><span class="loc-sub">Dom · 10h00</span></div>
+    <div class="loc-item"><span class="loc-n">03</span><span class="loc-name">Bairro Paris-Londres</span><span class="loc-sub">Arquitetura europeia</span></div>
+    <div class="loc-item"><span class="loc-n">04</span><span class="loc-name">Cerro Santa Lucía</span><span class="loc-sub">Entrada gratuita · Vista panorâmica</span></div>
+    <div class="loc-item"><span class="loc-n">05</span><span class="loc-name">Bocanariz / Lastarria</span><span class="loc-sub">Almoço · Cafés · Galerias</span></div>
+    <div class="loc-item"><span class="loc-n">06</span><span class="loc-name">Parque Forestal</span><span class="loc-sub">Passeio tranquilo</span></div>
+    <div class="loc-item"><span class="loc-n">07</span><span class="loc-name">Bellas Artes</span><span class="loc-sub">Área cultural</span></div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">09h30</div><div class="tl-label">Plaza de Armas + Catedral</div></div>
+    <div class="tl-item"><div class="tl-time">10h00</div><div class="tl-label">Troca de Guardas em La Moneda</div><div class="tl-sub">Acontece às 10h nos domingos — não perca!</div></div>
+    <div class="tl-item"><div class="tl-time">11h00</div><div class="tl-label">Bairro Paris-Londres + La Bolsa</div></div>
+    <div class="tl-item"><div class="tl-time">13h00</div><div class="tl-label">Almoço em Lastarria · Bocanariz</div></div>
+    <div class="tl-item"><div class="tl-time">14h30</div><div class="tl-label">Cerro Santa Lucía</div><div class="tl-sub">Mirante · Jardim Darwin · Castelo Hidalgo · Entrada grátis</div></div>
+    <div class="tl-item"><div class="tl-time">16h00</div><div class="tl-label">Parque Forestal + Bellas Artes</div></div>
+    <div class="tl-item"><div class="tl-time">19h00</div><div class="tl-label">Jantar em Lastarria</div></div>
+  </div>
+
+  <div class="opt-box reveal">
+    <div class="opt-badge">⬡ Opcional · individual</div>
+    <div class="opt-title">🎢 Fantasilandia — Parque de Diversões</div>
+    <div class="opt-desc">Opção para quem quiser um dia de adrenalina urbana. Parque de diversões no Parque O'Higgins, fácil acesso de metrô (linha 2). Alternativa ao city tour.</div>
+    <div class="opt-pills">
+      <div class="opt-pill">🎫 R$ 128,02</div>
+      <div class="opt-pill">🚇 Metrô linha 2 · 2x R$ 4,54</div>
+      <div class="opt-pill">🚗 Uber 3 pessoas · R$ 79</div>
+      <div class="opt-pill">🌐 fantasilandia.cl</div>
+    </div>
+  </div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Cerro Santa Lucía</span><span class="cost-val">Gratuito</span></div>
+    <div class="cost-row"><span class="cost-lbl">Almoço + jantar</span><span class="cost-val">R$ 80 – 150</span></div>
+    <div class="cost-row"><span class="cost-lbl">Fantasilandia (opcional)</span><span class="cost-val" style="color:var(--purple2)">R$ 128</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 80 – 278</span></div>
+  </div>
+  <div class="tip reveal"><strong>Cerro Santa Lucía:</strong> Use tênis confortáveis — o acesso é por escadarias íngremes. A vista do topo inclui o Cerro San Cristóbal, os Andes e o centro histórico. Dura ~45min a 2h. Acesso pela estação de metrô Santa Lucía.</div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 3: VALE NEVADO ── -->
+<section id="d3" class="sec bg-snow">
+  <div class="day-num reveal">Dia 3 · Segunda-feira, 10/08</div>
+  <h2 class="day-title reveal">"Valle Nevado"</h2>
+  <div class="day-date reveal">O maior resort de neve da América do Sul · 3.000m de altitude</div>
+  <div class="tag-row reveal">
+    <span class="tag r">⛰ Alta altitude · 3.000m</span>
+    <span class="tag a">❄️ Neve</span>
+    <span class="tag g">🎿 Resort premium</span>
+    <span class="tag p">⛷ Ski/Snowboard (opcional)</span>
+  </div>
+
+  <div class="alt-warn reveal">
+    <div class="aw-icon">🚨</div>
+    <div>
+      <div class="aw-title">Aviso de Altitude — 3.000m</div>
+      <div class="aw-text">É normal sentir falta de ar, tontura leve ou cansaço. Beba bastante água, evite álcool nas primeiras horas e não faça esforços bruscos. Pessoas com problemas cardíacos ou respiratórios devem consultar médico antes.</div>
+    </div>
+  </div>
+
+  <div class="img-row cols2 reveal" style="margin-top:1.5rem">
+    <div class="img-ph" style="height:200px">
+      <img src="https://sundaycooks.com/wp-content/uploads/2024/06/guia_de_valle_nevado.jpg" alt="Valle Nevado Resort" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:200px">
+      <img src="https://fuigosteitrips.com.br/wp-content/uploads/2022/07/tour-panoramico-ou-farellones-e1658584194812.jpeg" alt="Vista dos Andes" loading="lazy">
+    </div>
+  </div>
+
+  <div class="cards reveal d1" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-ico">🚡</div>
+      <div class="card-title">Gôndola panorâmica</div>
+      <div class="card-desc">A única gôndola do Chile, com vistas espetaculares dos picos nevados dos Andes. Uma das melhores experiências do resort mesmo sem esquiar.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🏔</div>
+      <div class="card-title">Valle Nevado Resort</div>
+      <div class="card-desc">Maior resort de neve da América do Sul. 2.200 acres de área esquiável, 17 elevadores, 6 restaurantes, bares e uma atmosfera única a 9.924 pés de altitude.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🍽</div>
+      <div class="card-title">Almoço na montanha</div>
+      <div class="card-desc">Restaurantes dentro do resort com culinária variada. Uma experiência única: comer com neve ao redor e os Andes na janela a 3.000m de altitude.</div>
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">06h30</div><div class="tl-label">Café da manhã no Airbnb</div></div>
+    <div class="tl-item"><div class="tl-time">07h00</div><div class="tl-label">Saída · parada na BlueSky Rental</div><div class="tl-sub">Constitução 142, Bellavista · Retirada de roupas e equipamentos</div></div>
+    <div class="tl-item"><div class="tl-time">09h – 10h</div><div class="tl-label">Cordilheira dos Andes</div><div class="tl-sub">Primeiras paradas fotográficas na subida</div></div>
+    <div class="tl-item"><div class="tl-time">10h – 16h</div><div class="tl-label">Valle Nevado Resort</div><div class="tl-sub">Gôndola, neve, almoço, fotos, atividades livres</div></div>
+    <div class="tl-item"><div class="tl-time">17h00</div><div class="tl-label">Retorno para Santiago</div></div>
+    <div class="tl-item"><div class="tl-time">19h – 20h</div><div class="tl-label">Chegada · jantar leve e descanso</div></div>
+  </div>
+
+  <div class="opt-box reveal">
+    <div class="opt-badge">⬡ Opcional · individual por escolha</div>
+    <div class="opt-title">🎿 Ski & Snowboard — BlueSky Chile</div>
+    <div class="opt-desc">Para quem quiser esquiar ou fazer snowboard. Aulas para iniciantes disponíveis. Não é obrigatório — cada um decide no dia.</div>
+    <div class="opt-pills">
+      <div class="opt-pill">⛷ Equipamentos: R$ 200</div>
+      <div class="opt-pill">🥋 Roupas de neve: R$ 80</div>
+      <div class="opt-pill">📍 Constitução 142, Bellavista</div>
+      <div class="opt-pill">🌐 blueskychile.com.br</div>
+    </div>
+  </div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row cost-paid"><span class="cost-lbl">✅ Ingresso Valle Nevado — PAGO</span><span class="cost-val">R$ 340</span></div>
+    <div class="cost-row"><span class="cost-lbl">Transfer (Chileando / We Love Chile)</span><span class="cost-val">R$ 245</span></div>
+    <div class="cost-row"><span class="cost-lbl">Aluguel roupas neve (BlueSky)</span><span class="cost-val">R$ 80</span></div>
+    <div class="cost-row"><span class="cost-lbl">Alimentação no resort</span><span class="cost-val">R$ 80 – 150</span></div>
+    <div class="cost-row"><span class="cost-lbl" style="color:var(--purple2)">Equipamentos ski/snow (opcional)</span><span class="cost-val" style="color:var(--purple2)">R$ 200</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 745 – 1.015</span></div>
+  </div>
+  <div class="tip reveal"><strong>Atenção:</strong> O ingresso já foi pago (Ticket Flex + Tarjeta). Cada um retira presencialmente no dia do passeio — o ticket está no e-mail de cada viajante.</div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 4: TERÇA ── -->
+<section id="d4" class="sec bg-wine">
+  <div class="day-num reveal">Dia 4 · Terça-feira, 11/08</div>
+  <h2 class="day-title reveal">"MUT, Lastarria<br>& Vinícola Alyan"</h2>
+  <div class="day-date reveal">Dia livre com opções premium à noite</div>
+  <div class="tag-row reveal">
+    <span class="tag a">🏙 MUT Tobalaba</span>
+    <span class="tag a">☕ Lastarria</span>
+    <span class="tag p">🍷 Vinícola Alyan (opcional)</span>
+    <span class="tag p">🍝 Amor y Pastas (opcional)</span>
+  </div>
+
+  <div class="img-row cols2 reveal">
+    <div class="img-ph" style="height:185px">
+      <img src="https://s.t13.cl/sites/default/files/styles/manualcrop_1600x800/public/t13/field-imagen/2025-09/exante%20mercado%20tobalaba%20ok.jpg.jpeg?itok=FUKnCMT1" alt="Mercado Urbano Tobalaba" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:185px">
+      <img src="https://chilenjoy.com/mt-content/uploads/2025/10/alyan-sunset-family-vinicola-vina-chilenjoy-agencia-turismo-passeios-santiago-chile-4-min.jpg" alt="Vinícola Alyan" loading="lazy">
+    </div>
+  </div>
+
+  <div class="cards reveal d1" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-ico">🏙</div>
+      <div class="card-title">MUT — Mercado Urbano Tobalaba</div>
+      <div class="card-desc">Primeira micro-cidade urbana do Chile. 187.000m² com 4 torres, 9 andares de varejo, gastronomia internacional de todo o mundo, e 20.000m² de áreas verdes. Integrado à estação de metrô Tobalaba (Linhas 1 e 4). Av. Apoquindo 3221.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">☕</div>
+      <div class="card-title">Lastarria</div>
+      <div class="card-desc">Bairro europeu e boêmio de Santiago — cafés de especialidade, galerias de arte, restaurantes modernos e ruas de paralelepípedo. O mais charmoso da cidade para um almoço e tarde livre.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">😌</div>
+      <div class="card-title">Descanso estratégico</div>
+      <div class="card-desc">Dia intencional entre Valle Nevado e Portillo para recuperar o corpo da altitude. Ritmo de cada um. Compras, cafés, shopping Costanera — cada um escolhe seu programa.</div>
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">Manhã</div><div class="tl-label">MUT — Mercado Urbano Tobalaba</div><div class="tl-sub">Café, gastronomia, passeio pela micro-cidade · Metrô Tobalaba</div></div>
+    <div class="tl-item"><div class="tl-time">Tarde</div><div class="tl-label">Lastarria + Providencia</div><div class="tl-sub">Cafés, galerias, shopping, descanso livre</div></div>
+    <div class="tl-item"><div class="tl-time">18h00</div><div class="tl-label">Opcional — Vinícola Alyan OU Amor y Pastas</div></div>
+  </div>
+
+  <div class="opt-box reveal">
+    <div class="opt-badge">⬡ Opcional 1 — altamente recomendado</div>
+    <div class="opt-title">🍷 Vinícola Alyan — Sunset · Valle do Maipo</div>
+    <div class="opt-desc">A vinícola boutique mais procurada por brasileiros em Santiago. Fundada pelo casal Alicia e Andrés (Alyan = Al+an), fica em Pirque, aos pés da Cordilheira. O único tour é o Sunset: visita guiada aos vinhedos, adega, tanques de fermentação e barricas — com degustações durante todo o percurso, tábua de frios no jardim e jantar informal ao pôr do sol.</div>
+    <div class="opt-pills">
+      <div class="opt-pill">🍷 Ingresso: R$ 289,60</div>
+      <div class="opt-pill">🚐 Transporte: R$ 150–226</div>
+      <div class="opt-pill">⏰ Tour Sunset · começa 18h</div>
+      <div class="opt-pill">🔞 Apenas maiores de 18</div>
+      <div class="opt-pill">⏳ ~4–5h total</div>
+    </div>
+  </div>
+
+  <div class="opt-box reveal">
+    <div class="opt-badge">⬡ Opcional 2 · data: 11/08 (ter)</div>
+    <div class="opt-title">🍝 Amor y Pastas — Fábrica de Massas</div>
+    <div class="opt-desc">Uma das experiências gastronômicas mais divertidas de Santiago. Todo mundo vai para uma fábrica de massas, escolhe o tipo (fettuccine, nhoque, sorrentino…), prepara a própria massa com música animada, brincadeiras em equipe e muita farinha. Depois janta o que fez. Bebidas inclusas: vinho, cerveja, pisco sour, aperol.</div>
+    <div class="opt-pills">
+      <div class="opt-pill">🍝 Ingresso: R$ 389,74</div>
+      <div class="opt-pill">🚗 Uber desde Airbnb: R$ 30</div>
+      <div class="opt-pill">⏰ 18h – 21h · ~3,5h</div>
+      <div class="opt-pill">📍 Hotel Sheraton · Av. Sta. María 1742</div>
+    </div>
+  </div>
+
+  <div class="tip reveal"><strong>Dica de grupo:</strong> Vinícola Alyan e Amor y Pastas são atividades separadas — o grupo não precisa fazer tudo junto. Quem quiser vinho e pôr do sol vai para o Alyan; quem preferir algo mais animado vai para o Amor y Pastas. Ou dividem!</div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Refeições e cafés do dia</span><span class="cost-val">R$ 60 – 120</span></div>
+    <div class="cost-row"><span class="cost-lbl" style="color:var(--purple2)">Vinícola Alyan (opcional)</span><span class="cost-val" style="color:var(--purple2)">R$ 440 – 516</span></div>
+    <div class="cost-row"><span class="cost-lbl" style="color:var(--purple2)">Amor y Pastas (opcional)</span><span class="cost-val" style="color:var(--purple2)">R$ 420</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 60 – 636</span></div>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 5: PORTILLO ── -->
+<section id="d5" class="sec bg-snow">
+  <div class="day-num reveal">Dia 5 · Quarta-feira, 12/08</div>
+  <h2 class="day-title reveal">"Portillo &<br>Laguna del Inca"</h2>
+  <div class="day-date reveal">O resort mais antigo da América do Sul · 2.880m · fronteira com a Argentina</div>
+  <div class="tag-row reveal">
+    <span class="tag r">⛰ 2.880m altitude</span>
+    <span class="tag a">🏞 Laguna del Inca</span>
+    <span class="tag a">📸 Estrada Los Caracoles</span>
+    <span class="tag p">🌃 Sky Costanera (opcional)</span>
+  </div>
+
+  <div class="alt-warn reveal">
+    <div class="aw-icon">🚨</div>
+    <div>
+      <div class="aw-title">Aviso de Altitude — 2.880m</div>
+      <div class="aw-text">Hidratação constante, sem álcool, sem esforços intensos. Altitude um pouco menor que Valle Nevado mas o cansaço do dia anterior pode intensificar os efeitos. Chocolate quente do Hotel Portillo é uma tradição — e ajuda no aconchego!</div>
+    </div>
+  </div>
+
+  <div class="img-row cols3 reveal" style="margin-top:1.5rem">
+    <div class="img-ph" style="height:165px">
+      <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/50/ad/26/photo3jpg.jpg?w=1200&h=-1&s=1" alt="Laguna del Inca" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:165px">
+      <img src="https://elements-resized.envatousercontent.com/elements-video-cover-images/1c32b161-b958-4ce6-9b9a-3b9fe4a666dd/video_preview/video_preview_0000.jpg?w=500&cf_fit=cover&q=85&format=auto&s=0337196e789f4401da3233618feaa8da05b24dbbc0a8ba5c7141483f53b28bcd" alt="Los Caracoles" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:165px">
+      <img src="https://cdn-ildpkee.nitrocdn.com/DsGrLBJYSVIbemNsaXNXftjpEWFMzpVF/assets/images/optimized/rev-ef5597b/skiportillo.com/wp-content/uploads/2022/01/hotel_img_foto1-1-1.png" alt="Hotel Portillo" loading="lazy">
+    </div>
+  </div>
+
+  <div class="cards reveal d1" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-ico">🏞</div>
+      <div class="card-title">Laguna del Inca</div>
+      <div class="card-desc">Lago glacial de cor azul-turquesa-esmeralda único no mundo, cercado por montanhas nevadas. Um dos cartões-postais mais deslumbrantes dos Andes. Fotografia incomparável — especialmente à tarde quando o sol reflete na água.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🛣</div>
+      <div class="card-title">Estrada Los Caracoles</div>
+      <div class="card-desc">A mesma estrada que liga Santiago a Mendoza, Argentina. Subida espetacular com curvas fechadas, marcos históricos da independência chilena e vistas que mudam a cada curva. Um dos percursos mais fotogênicos dos Andes.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🏨</div>
+      <div class="card-title">Hotel & Resort Portillo</div>
+      <div class="card-desc">O mais antigo resort de ski da América do Sul (1949). Palco do Campeonato Mundial de Ski em 1966. Menos comercial que Valle Nevado, com alma autêntica e paisagens ainda mais intensas. Chocolate quente no hotel é obrigatório!</div>
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">05h00</div><div class="tl-label">Acorda e prepara</div><div class="tl-sub">Saída muito cedo para aproveitar o dia todo</div></div>
+    <div class="tl-item"><div class="tl-time">05h30</div><div class="tl-label">Saída de Santiago — Chileando Juntos</div></div>
+    <div class="tl-item"><div class="tl-time">~07h30</div><div class="tl-label">Parada para café da manhã</div><div class="tl-sub">Inclusa na rota · por conta de cada um</div></div>
+    <div class="tl-item"><div class="tl-time">~08h30</div><div class="tl-label">Monumento Chacabuco + Salto del Soldado</div><div class="tl-sub">Marcos históricos da independência chilena</div></div>
+    <div class="tl-item"><div class="tl-time">~09h30</div><div class="tl-label">Estrada Los Caracoles — parada fotográfica</div><div class="tl-sub">Curvas espetaculares rumo à fronteira</div></div>
+    <div class="tl-item"><div class="tl-time">~10h00</div><div class="tl-label">Portillo + Laguna del Inca</div><div class="tl-sub">1h30–2h no local · fotos, chocolate quente, contemplação</div></div>
+    <div class="tl-item"><div class="tl-time">~13h00</div><div class="tl-label">Piquenique nos pés dos Andes</div><div class="tl-sub">Vinho, queijos e frios · incluso no tour Chilenjoy</div></div>
+    <div class="tl-item"><div class="tl-time">16h00</div><div class="tl-label">Retorno para Santiago</div></div>
+    <div class="tl-item"><div class="tl-time">~18h00</div><div class="tl-label">Chegada em Santiago</div></div>
+  </div>
+
+  <div class="opt-box reveal">
+    <div class="opt-badge">⬡ Opcional · noite de quarta</div>
+    <div class="opt-title">🏙 Sky Costanera — Pôr do sol na cidade</div>
+    <div class="opt-desc">O mirante mais alto de Santiago, no topo do Costanera Center (o maior shopping da América Latina). Melhor ao pôr do sol — você vê os Andes dourados de um lado e Santiago se estendendo do outro. Perfeito para quem estiver com energia após Portillo.</div>
+    <div class="opt-pills">
+      <div class="opt-pill">🎫 R$ 128,07</div>
+      <div class="opt-pill">⏰ Melhor: 17h–19h</div>
+      <div class="opt-pill">🌐 skycostanera.cl</div>
+    </div>
+  </div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Tour Portillo — Chileando Juntos</span><span class="cost-val">R$ 330</span></div>
+    <div class="cost-row"><span class="cost-lbl">Alimentação (café + piquenique incluso)</span><span class="cost-val">R$ 40 – 80</span></div>
+    <div class="cost-row"><span class="cost-lbl">Aluguel roupas neve (se necessário)</span><span class="cost-val">R$ 80 – 150</span></div>
+    <div class="cost-row"><span class="cost-lbl" style="color:var(--purple2)">Sky Costanera (opcional)</span><span class="cost-val" style="color:var(--purple2)">R$ 128</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 450 – 688</span></div>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 6: SUNSET INFINITUM ── -->
+<section id="d6" class="sec bg-sunset">
+  <div class="day-num reveal">Dia 6 · Quinta-feira, 13/08</div>
+  <h2 class="day-title reveal">"Sunset Infinitum 3K"</h2>
+  <div class="day-date reveal">Primeira festa sunset a 3.000m de altitude nos Andes · El Montañés, Valle Nevado</div>
+  <div class="tag-row reveal">
+    <span class="tag g">🌅 Pôr do sol nos Andes</span>
+    <span class="tag g">🎶 DJ ao vivo</span>
+    <span class="tag g">🍷 Open wine</span>
+    <span class="tag a">📸 Farellones</span>
+  </div>
+
+  <div class="img-row cols2 reveal">
+    <div class="img-ph" style="height:200px">
+      <img src="https://voceenchile.com.br/wp-content/uploads/2026/04/AC-SUNSET-Neve-DJ-Chile-3-1024x683.png" alt="Sunset Infinitum 3K" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:200px">
+      <img src="https://chilenjoy.com/mt-content/uploads/2020/02/valle-nevado-y-farellones-vilarejo-min.jpg" alt="Farellones" loading="lazy">
+    </div>
+  </div>
+
+  <div class="sunset-card reveal" style="margin-top:1.5rem">
+    <div class="sunset-title">🌄 Infinitum 3K — Uma experiência única no Cone Sul</div>
+    <div class="sunset-desc">Não é um evento. É o pôr do sol mais bonito do Chile, na neve, com vinho aberto e DJ ao vivo a 3.000 metros de altitude. El Montañés, Valle Nevado. Ambiente internacional, atmosfera exclusiva, memória para a vida toda.</div>
+    <div class="sunset-row">
+      <div><div class="sunset-item-label">Inclui</div><div class="sunset-item-val">Open wine · DJ · Show de luzes</div></div>
+      <div><div class="sunset-item-label">Local</div><div class="sunset-item-val">El Montañés · Valle Nevado</div></div>
+      <div><div class="sunset-item-label">Festa</div><div class="sunset-item-val">16h00 – 19h00</div></div>
+      <div><div class="sunset-item-label">Restrição</div><div class="sunset-item-val">+18 anos · exceto sábados</div></div>
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">09h00</div><div class="tl-label">Pickup nos hotéis / Airbnb</div></div>
+    <div class="tl-item"><div class="tl-time">~11h00</div><div class="tl-label">Farellones — vilarejo de montanha</div><div class="tl-sub">Neve, fotos, tempo livre, almoço por conta (recomendado almoçar aqui)</div></div>
+    <div class="tl-item"><div class="tl-time">~13h00</div><div class="tl-label">Paradas panorâmicas na Cordilheira</div></div>
+    <div class="tl-item"><div class="tl-time">~15h00</div><div class="tl-label">Chegada no El Montañés · Valle Nevado</div><div class="tl-sub">Vista panorâmica do resort antes da festa</div></div>
+    <div class="tl-item"><div class="tl-time">16h00 – 19h00</div><div class="tl-label">🎶 Sunset Infinitum 3K</div><div class="tl-sub">DJ · open wine · luz dourada · Andes ao fundo</div></div>
+    <div class="tl-item"><div class="tl-time">~21h00</div><div class="tl-label">Retorno para Santiago</div></div>
+  </div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Infinitum 3K (direto)</span><span class="cost-val">R$ 520</span></div>
+    <div class="cost-row"><span class="cost-lbl">We Love Chile (com transfer)</span><span class="cost-val">R$ 581</span></div>
+    <div class="cost-row"><span class="cost-lbl">Chileando Juntos (com transfer)</span><span class="cost-val">R$ 620</span></div>
+    <div class="cost-row"><span class="cost-lbl">Aluguel roupas neve (BlueSky)</span><span class="cost-val">R$ 80</span></div>
+    <div class="cost-row"><span class="cost-lbl">Almoço em Farellones</span><span class="cost-val">R$ 40 – 80</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 640 – 780</span></div>
+  </div>
+  <div class="tip reveal"><strong>Dica:</strong> Almoce em Farellones antes de chegar no evento — as opções dentro são mais limitadas e caras. O vinho é aberto durante toda a festa a partir das 16h. Traga câmera com bateria cheia — a luz dourada dos Andes ao pôr do sol é incomparável.</div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- ── DIA 7: ÚLTIMO DIA ── -->
+<section id="d7" class="sec bg-end">
+  <div class="day-num reveal">Dia 7 · Sexta-feira, 14/08</div>
+  <h2 class="day-title reveal">"Último Dia<br>em Santiago"</h2>
+  <div class="day-date reveal">Voo de volta · 23h50 · Santiago → Belo Horizonte (Latam)</div>
+  <div class="tag-row reveal">
+    <span class="tag a">⛩️ Cerro Santa Lucía</span>
+    <span class="tag">🛍 Compras finais</span>
+    <span class="tag a">🏙 City Tour</span>
+    <span class="tag r">✈️ Voo 23h50</span>
+  </div>
+
+  <div class="img-row cols2 reveal">
+    <div class="img-ph" style="height:190px">
+      <img src="https://midias.nosnochile.com.br/wp-content/uploads/2025/03/Teleferico-1-5.jpeg.webp" alt="Pôr do sol Santiago Teleférico" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:190px">
+      <img src="https://images.visitchile.com/destinos/504_Santa_Lucia.jpg" alt="Cerro Santa Lucía despedida" loading="lazy">
+    </div>
+  </div>
+
+  <div class="tl reveal" style="margin-top:1.5rem">
+    <div class="tl-item"><div class="tl-time">Manhã</div><div class="tl-label">Shopping e compras finais</div><div class="tl-sub">Chocolates La Mundial · lembranças · Mercado líder ou Jumbo</div></div>
+    <div class="tl-item"><div class="tl-time">Tarde</div><div class="tl-label">City Tour — pontos não visitados</div><div class="tl-sub">Últimos passeios pelo centro, cafés, Bellavista</div></div>
+    <div class="tl-item"><div class="tl-time">~16h00</div><div class="tl-label">Cerro Santa Lucía</div><div class="tl-sub">A despedida mais bonita de Santiago · Jardim Darwin · vista 360° · Entrada gratuita</div></div>
+    <div class="tl-item"><div class="tl-time">~18h00</div><div class="tl-label">Jantar de encerramento</div><div class="tl-sub">Último restaurante juntos em Santiago</div></div>
+    <div class="tl-item"><div class="tl-time">~20h30</div><div class="tl-label">Saída para o aeroporto</div><div class="tl-sub">Chegar com ~3h de antecedência para voo internacional</div></div>
+    <div class="tl-item"><div class="tl-time">23h50</div><div class="tl-label">✈ Latam · Santiago → Belo Horizonte</div><div class="tl-sub">Mala despachada inclusa · serviço de bordo · multimídia</div></div>
+  </div>
+
+  <div class="tip reveal"><strong>Compras:</strong> Chocolates La Mundial (icônico) fica numa galeria ao lado tem mochilas super baratas. Troca de dinheiro sobrando: Rua Augustinas e Av. Pedro de Valdivia. Mercado Líder é mais barato; Jumbo tem mais variedade.</div>
+
+  <div class="cost-block reveal">
+    <div class="cost-row"><span class="cost-lbl">Cerro Santa Lucía</span><span class="cost-val">Gratuito</span></div>
+    <div class="cost-row"><span class="cost-lbl">Refeições do dia</span><span class="cost-val">R$ 80 – 150</span></div>
+    <div class="cost-row"><span class="cost-lbl">Compras e lembranças</span><span class="cost-val">Variável</span></div>
+    <div class="cost-row"><span class="cost-lbl">Uber para o aeroporto</span><span class="cost-val">R$ 132 – 163 (carro)</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl">Total estimado / pessoa</span><span class="cost-val">R$ 130 – 250+</span></div>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- CLOSING -->
+<section class="sec" style="text-align:center;padding-bottom:8rem">
+  <div class="sec-label reveal">Resumo financeiro</div>
+  <div class="cost-block reveal" style="max-width:600px;margin:1rem auto 3rem;text-align:left">
+    <div class="cost-row"><span class="cost-lbl">Chegada + transfer</span><span class="cost-val">R$ 60</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 1 · City Tour + Pub Crawl</span><span class="cost-val">R$ 212 – 325</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 2 · Centro histórico</span><span class="cost-val">R$ 80 – 278</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 3 · Valle Nevado</span><span class="cost-val">R$ 745 – 1.015</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 4 · MUT + Lastarria</span><span class="cost-val">R$ 60 – 636</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 5 · Portillo</span><span class="cost-val">R$ 450 – 688</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 6 · Sunset Infinitum</span><span class="cost-val">R$ 640 – 780</span></div>
+    <div class="cost-row"><span class="cost-lbl">Dia 7 · Último dia</span><span class="cost-val">R$ 130 – 250</span></div>
+    <div class="cost-row"><span class="cost-lbl">Hospedagem (já pago)</span><span class="cost-val">R$ 829 / pessoa</span></div>
+    <div class="cost-row"><span class="cost-lbl" style="color:var(--text3);font-size:.75rem">* Passagens aéreas não inclusas neste resumo</span><span class="cost-val" style="color:var(--text3);font-size:.75rem">variável</span></div>
+    <div class="cost-row cost-total"><span class="cost-lbl" style="font-size:1rem">💰 Total estimado / pessoa</span><span class="cost-val" style="font-size:1.15rem">R$ 3.200 – 4.900</span></div>
+  </div>
+  <h2 class="closing-title reveal">Uma viagem<br>inesquecível.</h2>
+  <p style="color:var(--text2);max-width:440px;margin:0 auto 3rem" class="reveal">7 noites · 6 amigos · neve, vinho, noite, montanhas e memórias que vão durar para sempre.</p>
+  <div class="stat-grid reveal" style="max-width:700px;margin:0 auto">
+    <div class="stat-card"><span class="stat-num">7</span><span class="stat-label">Noites</span></div>
+    <div class="stat-card"><span class="stat-num">6</span><span class="stat-label">Amigos</span></div>
+    <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Tours neve</span></div>
+    <div class="stat-card"><span class="stat-num">1</span><span class="stat-label">Pub Crawl</span></div>
+    <div class="stat-card"><span class="stat-num">1</span><span class="stat-label">Sunset party</span></div>
+    <div class="stat-card"><span class="stat-num">∞</span><span class="stat-label">Memórias</span></div>
+  </div>
+</section>
+
+</div><!-- /p-roteiro -->
+
+<!-- ████████████████████  PAGE: RIO  ████████████████████ -->
+<div class="page" id="p-rio">
+<section style="padding:6rem 2rem 3rem;max-width:960px;margin:0 auto">
+  <div class="sec-label">Rio de Janeiro · 06/08</div>
+  <h2 class="sec-title">Um dia no Rio<br>antes do voo</h2>
+  <p class="sec-sub">Chegada no Rio às 07h45 do dia 06/08. Saída às 04h00 da madrugada de 07/08 para o Galeão. Um dia inteiro para aproveitar a Cidade Maravilhosa.</p>
+
+  <div class="voo-card">
+    <div class="voo-route">
+      <div class="voo-city"><div class="voo-city-code">BHZ</div><div class="voo-city-name">Belo Horizonte</div></div>
+      <div class="voo-arrow"></div>
+      <div class="voo-city"><div class="voo-city-code">GIG</div><div class="voo-city-name">Rio de Janeiro</div></div>
+    </div>
+    <div class="voo-details">
+      <div><div class="voo-detail-label">Data de chegada no Rio</div><div class="voo-detail-val">06/08/2026 · ~07h45</div></div>
+      <div><div class="voo-detail-label">Airbnb no Rio</div><div class="voo-detail-val">06/08 → 07/08</div></div>
+      <div><div class="voo-detail-label">Saída para Galeão</div><div class="voo-detail-val">07/08 · 04h00 da manhã</div></div>
+    </div>
+    <div><span class="voo-badge warn">⚠️ Saída às 04h — arrumar mala na noite anterior</span></div>
+  </div>
+
+  <div class="img-row cols3" style="margin-top:1.5rem">
+    <div class="img-ph" style="height:170px">
+      <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/8c/14/06/ipanema.jpg?w=1200&h=1200&s=1" alt="Praia de Ipanema" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRM6DNf8BEqrIGXkqSHNJKHa8xKVJJ7QDc1hw&s" alt="Mercado Rio" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://blog.blablacar.com.br/wp-content/uploads/2024/12/por-do-sol-arpoador.webp" alt="Pôr do sol Arpoador" loading="lazy">
+    </div>
+  </div>
+
+  <div class="tl" style="margin-top:2rem">
+    <div class="tl-item"><div class="tl-time">07h45</div><div class="tl-label">Chegada no Rio · Aeroporto Santos Dumont</div></div>
+    <div class="tl-item"><div class="tl-time">~09h00</div><div class="tl-label">Check-in no Airbnb + café da manhã</div><div class="tl-sub">Deixar as malas, tomar café em padaria carioca</div></div>
+    <div class="tl-item"><div class="tl-time">~10h30</div><div class="tl-label">Praia de Ipanema — Posto 10</div><div class="tl-sub">A praia mais famosa do Rio. Mate gelado + biscoito Globo são obrigatórios!</div></div>
+    <div class="tl-item"><div class="tl-time">~13h00</div><div class="tl-label">Almoço fora</div><div class="tl-sub">Culinária carioca — frutos do mar, churrasco ou comida local</div></div>
+    <div class="tl-item"><div class="tl-time">~14h30</div><div class="tl-label">Mercado + passeio</div><div class="tl-sub">Compras locais, exploração do bairro</div></div>
+    <div class="tl-item"><div class="tl-time">~16h30</div><div class="tl-label">Volta ao Airbnb + piscina</div><div class="tl-sub">Descanso, piscina se disponível no Airbnb</div></div>
+    <div class="tl-item"><div class="tl-time">~19h30</div><div class="tl-label">Jantar</div><div class="tl-sub">Último jantar carioca antes da viagem longa</div></div>
+    <div class="tl-item"><div class="tl-time">~21h00</div><div class="tl-label">Arrumar malas + descanso</div><div class="tl-sub">Acordar às ~03h00 para ir ao Galeão</div></div>
+    <div class="tl-item"><div class="tl-time">04h00 (dia 07/08)</div><div class="tl-label">Saída para Aeroporto Internacional Galeão (GIG)</div></div>
+  </div>
+
+  <div class="cards" style="margin-top:2rem">
+    <div class="card">
+      <div class="card-ico">🏖</div>
+      <div class="card-title">Praia de Ipanema · Posto 10</div>
+      <div class="card-desc">Entre o Posto 9 e o Posto 10 fica o trecho mais famoso e frequentado de Ipanema — jovens, turistas e locais. Venha de cedo para pegar lugar. Em agosto o tempo é agradável, sem calor excessivo.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🌅</div>
+      <div class="card-title">Pedra do Arpoador</div>
+      <div class="card-desc">Se der tempo, o pôr do sol da Pedra do Arpoador (entre Copacabana e Ipanema) é um clássico carioca. Os moradores aplaudem o sol ao se por — uma experiência única e gratuita.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🛒</div>
+      <div class="card-title">Mercado + alimentação</div>
+      <div class="card-desc">Aproveite para comprar alguma coisa local. Evite restaurantes da orla (pega-turista). Busque botecos e restaurantes nas ruas internas de Ipanema ou Copacabana.</div>
+    </div>
+  </div>
+
+  <div class="alt-warn" style="margin-top:1.5rem">
+    <div class="aw-icon">⏰</div>
+    <div>
+      <div class="aw-title">Lembrete importante</div>
+      <div class="aw-text">Saída para o Galeão às 04h da manhã de 07/08. Arrume as malas na noite anterior. O Airbnb do Rio está confirmado: <strong>HMDR4WAEPA</strong>. Atenção: a mala é despachada no Rio e retirada em Santiago — não precisa pegar na Argentina!</div>
+    </div>
+  </div>
+</section>
+</div><!-- /p-rio -->
+
+<!-- ████████████████████  PAGE: BUENOS AIRES  ████████████████████ -->
+<div class="page" id="p-ba">
+<section style="padding:6rem 2rem 3rem;max-width:960px;margin:0 auto">
+  <div class="sec-label">Buenos Aires, Argentina · 07/08</div>
+  <h2 class="sec-title">Conexão em<br>Buenos Aires</h2>
+  <p class="sec-sub">Conexão de algumas horas no Aeroparque Jorge Newbery (AEP) — voo para Santiago parte às 22h10. Dependendo do tempo livre, dá para sair rapidinho para o centro.</p>
+
+  <div class="voo-card">
+    <div class="voo-route">
+      <div class="voo-city"><div class="voo-city-code">GIG</div><div class="voo-city-name">Rio de Janeiro</div></div>
+      <div class="voo-arrow"></div>
+      <div class="voo-city"><div class="voo-city-code">AEP</div><div class="voo-city-name">Buenos Aires</div></div>
+      <div class="voo-arrow"></div>
+      <div class="voo-city"><div class="voo-city-code">SCL</div><div class="voo-city-name">Santiago</div></div>
+    </div>
+    <div class="voo-details">
+      <div><div class="voo-detail-label">Voo Rio → BA</div><div class="voo-detail-val">07/08 · 08h05 (JetSmart)</div></div>
+      <div><div class="voo-detail-label">Voo BA → Santiago</div><div class="voo-detail-val">07/08 · 22h10 (JetSmart)</div></div>
+      <div><div class="voo-detail-label">Aeroporto BA</div><div class="voo-detail-val">AEP · Aeroparque Newbery</div></div>
+    </div>
+    <div>
+      <span class="voo-badge warn">⚠️ JetSmart não oferece lanche — leve comida!</span>
+      <span class="voo-badge ok" style="margin-left:.5rem">✅ Mala despachada no Rio, retira em Santiago</span>
+    </div>
+  </div>
+
+  <div class="tip" style="max-width:100%;margin-top:1rem">
+    <strong>Atenção às malas:</strong> A mala é despachada no Rio (GIG) com destino final Santiago (SCL). Na Argentina você não precisa retirar — a mala segue direto. Só leve na mão o necessário para o dia em Buenos Aires.
+  </div>
+
+  <div class="img-row cols3" style="margin-top:2rem">
+    <div class="img-ph" style="height:170px">
+      <img src="https://cdn-imgix.headout.com/media/images/b8da531f-7c2a-4cbb-b677-18716d86366a-1747818847273-276449.jpg?auto=compress%2Cformat&w=900&h=562.5&q=90&ar=16%3A10&crop=faces%2Ccenter&fit=crop" alt="Caminito · La Boca" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Casa_Rosada_exterior_from_Plaza_de_Mayo.JPG" alt="Casa Rosada" loading="lazy">
+    </div>
+    <div class="img-ph" style="height:170px">
+      <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/81/72/ac/interno.jpg?w=1200&h=-1&s=1" alt="San Telmo" loading="lazy">
+    </div>
+  </div>
+
+  <div class="cards" style="margin-top:1.5rem">
+    <div class="card">
+      <div class="card-ico">🎨</div>
+      <div class="card-title">Caminito · La Boca</div>
+      <div class="card-desc">Rua com ~150m de casas coloridas e arte nas paredes — o cartão-postal mais fotogênico de Buenos Aires. Apresentações de tango ao vivo nas calçadas. <strong>Vá de táxi ou Uber — a caminhada pela área passa por regiões inseguras.</strong></div>
+    </div>
+    <div class="card">
+      <div class="card-ico">⚽</div>
+      <div class="card-title">La Bombonera</div>
+      <div class="card-desc">A 400m do Caminito fica o estádio histórico do Boca Juniors. Visita guiada com tour por todos os setores, incluindo campo e arquibancada. Mesmo para quem não é fã de futebol, a experiência histórica vale.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🛒</div>
+      <div class="card-title">Mercado de San Telmo</div>
+      <div class="card-desc">Bairro antigo e boêmio próximo ao centro. Mercado histórico com as melhores empanadas e choripán da viagem. Estátua da Mafalda na esquina das ruas Defensa e Chile. Fácil de combinar com Puerto Madero.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🏛</div>
+      <div class="card-title">Centro · Plaza de Mayo</div>
+      <div class="card-desc">Casa Rosada, Obelisco, Calle Florida (Galeria Pacífico), Teatro Colón. A rota clássica pelo coração histórico e cultural de Buenos Aires. Tudo a pé ou de táxi.</div>
+    </div>
+  </div>
+
+  <div class="tl" style="margin-top:2rem">
+    <div class="tl-item"><div class="tl-time">~10h30</div><div class="tl-label">Chegada em Buenos Aires · AEP</div><div class="tl-sub">Imigração argentina — processo rápido e automatizado</div></div>
+    <div class="tl-item"><div class="tl-time">~11h30</div><div class="tl-label">Linha 8 semirápido → Centro</div><div class="tl-sub">Plataforma na saída do aeroporto · pagar com cartão de débito · R$2,90 · acompanhar paradas no Google Maps</div></div>
+    <div class="tl-item"><div class="tl-time">~12h30</div><div class="tl-label">Caminito + La Bombonera</div><div class="tl-sub">Use táxi ou Uber — não vá a pé de San Telmo ao Caminito</div></div>
+    <div class="tl-item"><div class="tl-time">~14h00</div><div class="tl-label">Almoço em San Telmo ou La Boca</div><div class="tl-sub">Choripán, empanadas ou churrasco — culinária argentina clássica</div></div>
+    <div class="tl-item"><div class="tl-time">~15h30</div><div class="tl-label">Mercado de San Telmo + Centro</div><div class="tl-sub">Plaza de Mayo, Casa Rosada, Obelisco, Calle Florida</div></div>
+    <div class="tl-item"><div class="tl-time">~17h30</div><div class="tl-label">Puerto Madero</div><div class="tl-sub">Ponte da Mulher, passeio à beira do canal, jantar se der tempo</div></div>
+    <div class="tl-item"><div class="tl-time">~19h30</div><div class="tl-label">Retorno ao aeroporto</div><div class="tl-sub">Chegar com ~2h30 de antecedência — voo JetSmart internacional</div></div>
+    <div class="tl-item"><div class="tl-time">22h10</div><div class="tl-label">✈ JetSmart · Buenos Aires → Santiago</div></div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin:2.5rem 0 1rem">Comidas para não perder</h3>
+  <div class="cards">
+    <div class="card"><div class="card-ico">🥩</div><div class="card-title">Choripán</div><div class="card-desc">O sanduíche de linguiça argentina com chimichurri. Obrigatório. Preço acessível em qualquer esquina do centro.</div></div>
+    <div class="card"><div class="card-ico">🫓</div><div class="card-title">Empanadas</div><div class="card-desc">No Mercado de San Telmo ou direto de padarias. Recheios variados — carne, queijo, frango. Melhor comida rápida da Argentina.</div></div>
+    <div class="card"><div class="card-ico">🥐</div><div class="card-title">Medialuna</div><div class="card-desc">O croissant argentino — mais doce e amanteigado que o francês. Para o café da manhã ou lanche rápido.</div></div>
+  </div>
+
+  <div class="alt-warn" style="margin-top:1.5rem">
+    <div class="aw-icon">🚨</div>
+    <div>
+      <div class="aw-title">Segurança em Buenos Aires</div>
+      <div class="aw-text">Nunca vá a pé de San Telmo ao Caminito — a área entre os dois bairros tem histórico de furtos. Use Uber ou táxi para se deslocar entre La Boca e o centro. Na região do Caminito, fique no perímetro turístico e atenção aos pertences. Evite ostentação de celulares caros.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin:2.5rem 0 1rem">Imigração Argentina</h3>
+  <div class="cards">
+    <div class="card"><div class="card-ico">📄</div><div class="card-title">Documentos necessários</div><div class="card-desc">Passaporte válido ou RG físico em bom estado (menos de 10 anos). CNH e RG digital não são aceitos. Comprovante de hospedagem, passagem de retorno e seguro viagem.</div></div>
+    <div class="card"><div class="card-ico">✅</div><div class="card-title">Processo rápido</div><div class="card-desc">Brasileiros não precisam de visto. Processo automatizado com foto e digital. Sem formulários de saúde. Siga as placas "Migraciones" no aeroporto.</div></div>
+    <div class="card"><div class="card-ico">🧳</div><div class="card-title">Malas</div><div class="card-desc">Mala despachada no Rio com destino Santiago — não retira em Buenos Aires. Leve apenas o essencial na bagagem de mão para o dia em BA.</div></div>
+  </div>
+</section>
+</div><!-- /p-ba -->
+
+<!-- ████████████████████  PAGE: GUIA  ████████████████████ -->
+<div class="page" id="p-guia">
+<section style="padding:6rem 2rem 3rem;max-width:960px;margin:0 auto">
+
+  <div class="sec-label">Guia prático</div>
+  <h2 class="sec-title">Tudo que você precisa<br>em um lugar</h2>
+
+  <!-- VOOS -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">✈️ Voos</h3>
+  <div class="voo-card">
+    <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">IDA</div>
+    <div class="voo-route">
+      <div class="voo-city"><div class="voo-city-code">GIG</div><div class="voo-city-name">Rio de Janeiro</div></div>
+      <div class="voo-arrow"></div>
+      <div class="voo-city"><div class="voo-city-code">AEP</div><div class="voo-city-name">Buenos Aires</div></div>
+      <div class="voo-arrow"></div>
+      <div class="voo-city"><div class="voo-city-code">SCL</div><div class="voo-city-name">Santiago</div></div>
+    </div>
+    <div class="voo-details">
+      <div><div class="voo-detail-label">Rio → Buenos Aires</div><div class="voo-detail-val">07/08 · 08h05 · JetSmart</div></div>
+      <div><div class="voo-detail-label">Buenos Aires → Santiago</div><div class="voo-detail-val">07/08 · 22h10 · JetSmart</div></div>
+      <div><div class="voo-detail-label">Mala</div><div class="voo-detail-val">Despachada no Rio → Santiago</div></div>
+      <div><div class="voo-detail-label">Vendida por</div><div class="voo-detail-val">Decolar</div></div>
+    </div>
+    <div><span class="voo-badge warn">⚠️ JetSmart não oferece lanche — leve comida e água!</span></div>
+  </div>
+
+  <div class="voo-card" style="margin-top:.75rem">
+    <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem">VOLTA</div>
+    <div class="voo-route">
+      <div class="voo-city"><div class="voo-city-code">SCL</div><div class="voo-city-name">Santiago</div></div>
+      <div class="voo-arrow" style="background:linear-gradient(90deg,var(--gold),var(--accent))"></div>
+      <div class="voo-city"><div class="voo-city-code">BHZ</div><div class="voo-city-name">Belo Horizonte</div></div>
+    </div>
+    <div class="voo-details">
+      <div><div class="voo-detail-label">Data</div><div class="voo-detail-val">14/08 · 23h50 · Latam</div></div>
+      <div><div class="voo-detail-label">Mala</div><div class="voo-detail-val">Despachada inclusa</div></div>
+      <div><div class="voo-detail-label">Bordo</div><div class="voo-detail-val">Lanche gratuito + multimídia</div></div>
+    </div>
+    <div><span class="voo-badge ok">✅ Latam — serviço de bordo gratuito</span></div>
+  </div>
+
+  <!-- IMIGRAÇÃO -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">🛂 Imigração no Chile</h3>
+  <div class="cards">
+    <div class="card"><div class="card-ico">📄</div><div class="card-title">Documentos</div><div class="card-desc">Passaporte (validade 6 meses) ou RG físico em perfeito estado (menos de 10 anos). CNH não é válida. Tenha na mão: passagem de volta, endereço do Airbnb e comprovante financeiro.</div></div>
+    <div class="card"><div class="card-ico">🌿</div><div class="card-title">Declaração SAG</div><div class="card-desc">Preencha online até 48h antes do voo no site do Serviço Nacional de Aduanas do Chile. Todo produto de origem vegetal ou animal deve ser declarado. Obrigatório!</div></div>
+    <div class="card"><div class="card-ico">📋</div><div class="card-title">Guarde o papel da PDI</div><div class="card-desc">O comprovante entregue na imigração de entrada deve ser guardado junto ao passaporte. Ele será exigido pelas autoridades na hora de embarcar de volta ao Brasil.</div></div>
+  </div>
+
+  <!-- HOSPEDAGEM -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">🏠 Hospedagem</h3>
+  <div class="hosp-card">
+    <div class="hosp-title">Airbnb · Providencia · Santiago</div>
+    <div class="hosp-row"><span class="hosp-key">Endereço</span><span class="hosp-val">Av. Providencia 2562, Providencia</span></div>
+    <div class="hosp-row"><span class="hosp-key">Configuração</span><span class="hosp-val">2 quartos · 5 camas · 2 banheiros privados</span></div>
+    <div class="hosp-row"><span class="hosp-key">Check-in</span><span class="hosp-val">07/08/2026 (madrugada)</span></div>
+    <div class="hosp-row"><span class="hosp-key">Check-out</span><span class="hosp-val">14/08/2026 (noite)</span></div>
+    <div class="hosp-row"><span class="hosp-key">Reserva</span><span class="hosp-val">HMD9XFTEF2</span></div>
+    <div class="hosp-row"><span class="hosp-key">Quem pagou</span><span class="hosp-val">Luana</span></div>
+    <div class="hosp-row"><span class="hosp-key">Total</span><span class="hosp-val">R$ 4.974,14</span></div>
+    <div class="hosp-highlight">
+      <div class="hosp-highlight-label">Parcelamento — Pix para Luana todo dia 01</div>
+      <div class="hosp-highlight-val">6x de R$ 138,17 / pessoa · Início: 01/06/2026</div>
+    </div>
+  </div>
+
+  <!-- TRANSPORTE -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">🚇 Transporte em Santiago</h3>
+
+  <div class="transport-card">
+    <div class="transport-head">
+      <div class="transport-ico">🚐</div>
+      <div class="transport-name">Transvip — Transfer Aeroporto</div>
+      <div class="transport-badge ok">Recomendado chegada</div>
+    </div>
+    <div class="transport-rows">
+      <div class="transport-row"><span class="transport-row-key">Van até 7 pessoas (total)</span><span class="transport-row-val">R$ 422,24</span></div>
+      <div class="transport-row"><span class="transport-row-key">Por pessoa</span><span class="transport-row-val">R$ 60,32</span></div>
+      <div class="transport-row"><span class="transport-row-key">Site</span><span class="transport-row-val">transvip.cl</span></div>
+    </div>
+  </div>
+
+  <div class="transport-card">
+    <div class="transport-head">
+      <div class="transport-ico">🚗</div>
+      <div class="transport-name">Uber</div>
+      <div class="transport-badge ok">Use no dia a dia</div>
+    </div>
+    <div class="transport-rows">
+      <div class="transport-row"><span class="transport-row-key">Aeroporto → Providencia (3–4 pessoas)</span><span class="transport-row-val">R$ 132 – 163</span></div>
+      <div class="transport-row"><span class="transport-row-key">Corrida ~20min / 8km</span><span class="transport-row-val">R$ 65,79</span></div>
+      <div class="transport-row"><span class="transport-row-key">Funciona?</span><span class="transport-row-val">Sim · preços um pouco acima do Brasil</span></div>
+    </div>
+  </div>
+
+  <div class="transport-card">
+    <div class="transport-head">
+      <div class="transport-ico">🚇</div>
+      <div class="transport-name">Metrô de Santiago</div>
+      <div class="transport-badge ok">Econômico</div>
+    </div>
+    <div class="transport-rows">
+      <div class="transport-row"><span class="transport-row-key">Cartão BIP (comprar 1 por grupo)</span><span class="transport-row-val">R$ 8,72 (CLP 1.550)</span></div>
+      <div class="transport-row"><span class="transport-row-key">Recarga por viagem</span><span class="transport-row-val">R$ 3,99 – 4,89</span></div>
+      <div class="transport-row"><span class="transport-row-key">Várias pessoas no mesmo cartão?</span><span class="transport-row-val">Sim · não precisa 1 por pessoa</span></div>
+      <div class="transport-row"><span class="transport-row-key">Site horários</span><span class="transport-row-val">metro.cl</span></div>
+    </div>
+  </div>
+
+  <div class="transport-card">
+    <div class="transport-head">
+      <div class="transport-ico">🚕</div>
+      <div class="transport-name">Táxi</div>
+      <div class="transport-badge warn">NÃO usar</div>
+    </div>
+    <div class="transport-rows">
+      <div class="transport-row"><span class="transport-row-key">Por quê evitar?</span><span class="transport-row-val">Costumam aplicar golpes em turistas</span></div>
+      <div class="transport-row"><span class="transport-row-key">Alternativa</span><span class="transport-row-val">Uber ou Didi</span></div>
+    </div>
+  </div>
+
+  <!-- CHIP INTERNET -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">📱 Chip / Internet</h3>
+  <div class="chip-grid">
+    <div class="chip-card">
+      <div class="chip-title">📲 e-SIM · Airalo</div>
+      <div class="chip-rows">
+        <div class="chip-row"><span class="chip-key">1 GB · US$5</span><span class="chip-val">~R$ 27</span></div>
+        <div class="chip-row"><span class="chip-key">2 GB · US$8</span><span class="chip-val">~R$ 43</span></div>
+        <div class="chip-row"><span class="chip-key">3 GB · US$10,50</span><span class="chip-val">~R$ 57</span></div>
+        <div class="chip-row"><span class="chip-key">Site</span><span class="chip-val">airalo.com</span></div>
+      </div>
+    </div>
+    <div class="chip-card">
+      <div class="chip-title">💳 Chip físico · Aeroporto</div>
+      <div class="chip-rows">
+        <div class="chip-row"><span class="chip-key">50 GB por 30 dias</span><span class="chip-val">R$ 8,35</span></div>
+        <div class="chip-row"><span class="chip-key">Marcas</span><span class="chip-val">Won ou Clado</span></div>
+        <div class="chip-row"><span class="chip-key">Necessário</span><span class="chip-val">Passaporte para ativar</span></div>
+        <div class="chip-row"><span class="chip-key">Melhor custo?</span><span class="chip-val">Sim — 50GB por R$8</span></div>
+      </div>
+    </div>
+    <div class="chip-card">
+      <div class="chip-title">📶 Roaming brasileiro</div>
+      <div class="chip-rows">
+        <div class="chip-row"><span class="chip-key">Funciona?</span><span class="chip-val">Sim (BR + CL têm acordo)</span></div>
+        <div class="chip-row"><span class="chip-key">Plano pós-pago</span><span class="chip-val">Funciona melhor</span></div>
+        <div class="chip-row"><span class="chip-key">Ativar antes</span><span class="chip-val">Ligar para operadora</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTA INTERNACIONAL -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">💳 Conta Internacional (Wise)</h3>
+  <div class="wise-grid">
+    <div class="wise-item"><span class="wise-name">Filipe Ferreira</span><span class="wise-status-ok">✅ OK</span></div>
+    <div class="wise-item"><span class="wise-name">Filipe Portilho</span><span class="wise-status-ok">✅ OK</span></div>
+    <div class="wise-item"><span class="wise-name">Luana</span><span class="wise-status-ok">✅ OK</span></div>
+    <div class="wise-item"><span class="wise-name">Lorena</span><span class="wise-status-ok">✅ OK</span></div>
+    <div class="wise-item"><span class="wise-name">Renan</span><span class="wise-status-pend">⚠️ PENDENTE</span></div>
+    <div class="wise-item"><span class="wise-name">Yuri</span><span class="wise-status-ok">✅ OK</span></div>
+  </div>
+  <div class="tip" style="max-width:100%;margin-top:.75rem"><strong>Renan:</strong> Pendente! Resolver antes da viagem. Wise funciona no metrô (cartão de débito) e em compras internacionais sem taxas abusivas.</div>
+
+  <!-- SEGURO VIAGEM -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">💊 Seguro Viagem</h3>
+  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r2);overflow:hidden;overflow-x:auto">
+    <table class="seguro-table">
+      <thead>
+        <tr>
+          <th>Seguro</th>
+          <th>Preço (Pix)</th>
+          <th>Assist. Médica</th>
+          <th>Bagagem</th>
+          <th>Cancelamento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>IS15 AL com Covid</td><td class="price">R$ 52,50</td><td>US$ 15.000</td><td>US$ 200</td><td>US$ 500</td></tr>
+        <tr><td>Travel Care 15K</td><td class="price">R$ 54,24</td><td>US$ 15.000</td><td>US$ 1.000</td><td>US$ 100</td></tr>
+        <tr><td>Affinity 20 com Covid</td><td class="price">R$ 59,52</td><td>US$ 20.000</td><td>US$ 300</td><td>US$ 300</td></tr>
+        <tr><td>SulAmérica Américas</td><td class="price">R$ 67,91</td><td>US$ 15.000</td><td>US$ 1.500</td><td>R$ 1.000</td></tr>
+        <tr><td>ITA SMART 60 AM</td><td class="price">R$ 69,89</td><td>US$ 60.000</td><td>US$ 1.250</td><td>US$ 1.000</td></tr>
+        <tr><td>UA 80k + Covid</td><td class="price">R$ 83,20</td><td>US$ 80.000</td><td>US$ 1.500</td><td>—</td></tr>
+        <tr><td>UA 150k + Covid</td><td class="price">R$ 112,00</td><td>US$ 150.000</td><td>US$ 1.500</td><td>—</td></tr>
+        <tr><td>Affinity 150 Mundo</td><td class="price">R$ 118,00</td><td>US$ 150.000</td><td>US$ 1.200</td><td>US$ 1.000</td></tr>
+        <tr><td>Travel Care 150K</td><td class="price">R$ 130,00</td><td>US$ 150.000</td><td>US$ 1.500</td><td>US$ 1.000</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tip" style="max-width:100%;margin-top:.75rem"><strong>Cupons:</strong> Link da Karina (prima do Filipe Ferreira) com 10% de desconto: <strong>tr.ee/tzL-4SayKs</strong> · Allianz Travel com cupom <strong>MELHORESDESTINOS</strong> (até 70% off).</div>
+
+  <!-- DICAS CHILE -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:2.5rem 0 1rem">🇨🇱 Dicas Gerais · Chile</h3>
+  <div class="cards">
+    <div class="card"><div class="card-ico">🔌</div><div class="card-title">Tomadas</div><div class="card-desc">Chile usa 220V com 3 pinos retos. As tomadas brasileiras de 2 pinos funcionam normalmente — sem necessidade de adaptador para a maioria dos carregadores.</div></div>
+    <div class="card"><div class="card-ico">💱</div><div class="card-title">Troca de dinheiro</div><div class="card-desc">Rua Augustinas e Av. Pedro de Valdivia no centro de Santiago. Mercado Líder (mais barato) ou Jumbo (mais variedade) para compras do dia a dia.</div></div>
+    <div class="card"><div class="card-ico">🍔</div><div class="card-title">Empanadas do McDonald's</div><div class="card-desc">Uma dica real: 3 empanadas por 2.000 pesos (~R$11). São uma delícia e salvam a fome entre passeios sem gastar muito.</div></div>
+    <div class="card"><div class="card-ico">🎒</div><div class="card-title">Mochila barata</div><div class="card-desc">Na galeria ao lado da La Mundial tem mochilas super baratas. Se precisar de uma extra para os passeios de neve, compre lá.</div></div>
+    <div class="card"><div class="card-ico">🛍</div><div class="card-title">Sacola própria</div><div class="card-desc">Os mercados do Chile não vendem nem dão sacola. Leve uma sacola de pano para compras no supermercado.</div></div>
+    <div class="card"><div class="card-ico">📱</div><div class="card-title">Apps essenciais</div><div class="card-desc">Pedidos Ya (delivery · como iFood), Uber ou Didi (transporte · fuja de táxi), Google Maps com mapa offline de Santiago baixado.</div></div>
+  </div>
+
+</section>
+</div><!-- /p-guia -->
+
+<!-- ████████████████████  PAGE: VIAJANTES  ████████████████████ -->
+<div class="page" id="p-viajantes">
+<section style="padding:6rem 2rem 3rem;max-width:960px;margin:0 auto">
+  <div class="sec-label">O grupo</div>
+  <h2 class="sec-title">6 amigos,<br>uma aventura</h2>
+  <p class="sec-sub" style="margin-bottom:2.5rem">Dados de cada viajante para emergências, imigração e contatos importantes.</p>
+
+  <div class="viajante-grid">
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar">FF</div>
+        <div><div class="viajante-name">Filipe Ferreira Diniz</div><div style="font-size:.75rem;color:var(--text3)">Organizador · Link dos descontos</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">30/03/2004</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">20886910</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">144.631.676-98</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 99327-3996</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">14463167698</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">filipefdiniz30@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Patrícia · (31) 99293-7061</div>
+        <div style="font-size:.78rem;color:var(--text2)">Fábio · (31) 99165-0801</div>
+      </div>
+    </div>
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar" style="background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.3);color:var(--purple2)">FP</div>
+        <div><div class="viajante-name">Filipe Portilho Andrade</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">19/11/2002</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">21177679</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">147.071.226-12</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 99380-1893</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">14707122612</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">filipeportilhoa@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Geraldo · (31) 98823-0054</div>
+        <div style="font-size:.78rem;color:var(--text2)">Valéria · (31) 99182-5424</div>
+      </div>
+    </div>
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green2)">RM</div>
+        <div><div class="viajante-name">Renan Machado de Oliveira</div><div style="font-size:.75rem;color:#fde68a">⚠️ Wise pendente</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">21/03/2006</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">19215769</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">098.387.696-73</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 98885-4368</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">09838769673</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">renan21034368@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Washington · (31) 99799-4622</div>
+        <div style="font-size:.78rem;color:var(--text2)">Rosana · (31) 99208-4669</div>
+      </div>
+    </div>
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar" style="background:rgba(244,114,182,.12);border-color:rgba(244,114,182,.3);color:#f9a8d4">LM</div>
+        <div><div class="viajante-name">Lorena Machado de Oliveira</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">14/07/2003</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">16.159.161</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">098.387.706-80</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 99843-4368</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">31998434368</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">lorenamachado623@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Washington · (31) 99799-4622</div>
+        <div style="font-size:.78rem;color:var(--text2)">Rosana · (31) 99208-4669</div>
+      </div>
+    </div>
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3);color:#fde68a">YL</div>
+        <div><div class="viajante-name">Yuri Lucas Silva Ferreira</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">23/08/2001</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">19276943</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">153.873.756-64</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 97578-9595</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">15387375664</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">yurilucassfm@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Simone · (31) 98694-2470</div>
+        <div style="font-size:.78rem;color:var(--text2)">Lucilio · (31) 97557-4741</div>
+      </div>
+    </div>
+
+    <div class="viajante-card">
+      <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.9rem">
+        <div class="viajante-avatar" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.3);color:#5eead4">LA</div>
+        <div><div class="viajante-name">Luana Mateus de Almeida</div><div style="font-size:.75rem;color:var(--gold2)">💳 Pagou o Airbnb</div></div>
+      </div>
+      <div class="viajante-row"><span class="viajante-key">Nascimento</span><span class="viajante-val">25/06/2003</span></div>
+      <div class="viajante-row"><span class="viajante-key">RG</span><span class="viajante-val">15693003</span></div>
+      <div class="viajante-row"><span class="viajante-key">CPF</span><span class="viajante-val">076.166.566-84</span></div>
+      <div class="viajante-row"><span class="viajante-key">Tel</span><span class="viajante-val">(31) 99396-2016</span></div>
+      <div class="viajante-row"><span class="viajante-key">Pix</span><span class="viajante-val">+55 31 99396-2016</span></div>
+      <div class="viajante-row"><span class="viajante-key">Email</span><span class="viajante-val">luanasoaressw@gmail.com</span></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid var(--border)">
+        <div style="font-size:.7rem;color:var(--text3);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.08em">Contato de emergência</div>
+        <div style="font-size:.78rem;color:var(--text2)">Duca · (31) 99151-9779</div>
+        <div style="font-size:.78rem;color:var(--text2)">Gleison · (31) 99319-9052</div>
+      </div>
+    </div>
+
+  </div><!-- /viajante-grid -->
+
+  <!-- CHECKLIST -->
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin:3rem 0 1rem">🧳 Checklist da Mala</h3>
+  <p style="font-size:.85rem;color:var(--text3);margin-bottom:1rem">Clique para marcar o que já está pronto!</p>
+  <div class="check-grid" id="checklist">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">💧</div><div>Água Benedictino ou Nestlé</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🏠</div><div>Hospedagem confirmada</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">✈️</div><div>Passagens compradas</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🧥</div><div>Roupas térmicas</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">💊</div><div>Seguro viagem</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">💉</div><div>Medicamentos pessoais</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🗺</div><div>Roteiro salvo offline</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">📱</div><div>Chip / e-SIM para internet</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🧤</div><div>Meias térmicas e luvas</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">👢</div><div>Bota/coturno quentinho</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🔋</div><div>Power bank até 20.000 mAh</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🌨</div><div>Roupa de neve (ou aluguel)</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🚐</div><div>Transfer para os tours confirmado</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">☀️</div><div>Protetor solar + labial + hidratante</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">💳</div><div>Cartão Wise cadastrado no Uber</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🚇</div><div>Wise ou cartão de débito para metrô</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">📐</div><div>Tripé (cuidado com celular na rua)</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">📿</div><div>Cordinha para celular</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">💵</div><div>Câmbio: R. Augustinas / Av. P. Valdivia</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🍫</div><div>Chocolates La Mundial (na volta)</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🛍</div><div>Sacola reutilizável para mercado</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">📋</div><div>Declaração SAG (online · até 48h antes)</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">🔌</div><div>Adaptador de tomada (não obrigatório)</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-ico">📄</div><div>RG/Passaporte válido (menos de 10 anos)</div></div>
+  </div>
+
+</section>
+</div><!-- /p-viajantes -->
+
+<script>
+// ── STARS ──
+const sc=document.getElementById('starCanvas'),sx=sc.getContext('2d');
+let sw,sh,stars=[];
+function initStars(){sw=sc.width=innerWidth;sh=sc.height=innerHeight;stars=[];for(let i=0;i<100;i++)stars.push({x:Math.random()*sw,y:Math.random()*sh,r:Math.random()*1.1+.3,a:Math.random(),s:Math.random()*.004+.002})}
+function drawStars(){sx.clearRect(0,0,sw,sh);stars.forEach(s=>{s.a+=s.s;sx.beginPath();sx.arc(s.x,s.y,s.r,0,Math.PI*2);sx.fillStyle=`rgba(180,210,255,${Math.abs(Math.sin(s.a))*.55+.1})`;sx.fill()});requestAnimationFrame(drawStars)}
+initStars();drawStars();addEventListener('resize',initStars);
+
+// ── SNOW ──
+const nc=document.getElementById('snowCanvas'),nx=nc.getContext('2d');
+let nw,nh,flakes=[],snowOn=false;
+function initSnow(){nw=nc.width=innerWidth;nh=nc.height=innerHeight}
+function mkFlake(){return{x:Math.random()*nw,y:-10,r:Math.random()*2.5+.8,spd:Math.random()*1.2+.4,w:Math.random()*.4-.2,a:Math.random()*.7+.2}}
+function drawSnow(){nx.clearRect(0,0,nw,nh);if(snowOn&&flakes.length<70)flakes.push(mkFlake());flakes=flakes.filter(f=>f.y<nh+10);flakes.forEach(f=>{f.y+=f.spd;f.x+=f.w;nx.beginPath();nx.arc(f.x,f.y,f.r,0,Math.PI*2);nx.fillStyle=`rgba(220,235,255,${f.a})`;nx.fill()});requestAnimationFrame(drawSnow)}
+initSnow();drawSnow();addEventListener('resize',initSnow);
+
+// ── TABS ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map={'p-home':0,'p-rio':1,'p-ba':2,'p-roteiro':3,'p-guia':4,'p-viajantes':5};
+  document.querySelectorAll('.tab-btn')[map[id]].classList.add('active');
+  document.getElementById('dotNav').style.display=id==='p-roteiro'?'flex':'none';
+  window.scrollTo(0,0);
+  triggerReveal();
+}
+
+// ── SCROLL REVEAL ──
+const snowSections=['d3','d5','d6'];
+function triggerReveal(){
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el=>{
+    const r=el.getBoundingClientRect();
+    if(r.top<innerHeight-60)el.classList.add('visible');
+  });
+}
+
+addEventListener('scroll',()=>{
+  // progress bar
+  const sh=document.documentElement.scrollHeight-innerHeight;
+  document.getElementById('prog').style.width=(scrollY/sh*100)+'%';
+  // dot nav
+  const dots=document.querySelectorAll('.dot-wrap');
+  const ids=['hero','chegada','d1','d2','d3','d4','d5','d6','d7'];
+  let cur='hero';
+  ids.forEach(id=>{const el=document.getElementById(id);if(el&&scrollY>=el.offsetTop-220)cur=id});
+  dots.forEach(d=>{d.classList.toggle('active',d.getAttribute('href')==='#'+cur)});
+  // snow
+  const isSnow=snowSections.includes(cur);
+  nc.classList.toggle('on',isSnow);snowOn=isSnow;
+  // reveal
+  triggerReveal();
+});
+
+// ── COUNTERS ──
+function counter(el,target,dur,suffix=''){
+  let s=null;
+  const step=ts=>{
+    if(!s)s=ts;
+    const p=Math.min((ts-s)/dur,1);
+    el.textContent=Math.round(p*target)+(suffix||'');
+    if(p<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+setTimeout(()=>{
+  counter(document.getElementById('c-days'),7,1400);
+  counter(document.getElementById('c-friends'),6,1600);
+  counter(document.getElementById('c-mtn'),3,1800);
+  counter(document.getElementById('c-alt'),3000,2200);
+},600);
+
+// ── PLANE ──
+function animPlane(){
+  const path=document.getElementById('rp'),plane=document.getElementById('plane-icon');
+  if(!path||!plane)return;
+  const len=path.getTotalLength?path.getTotalLength():900;
+  let s=null;
+  const step=ts=>{
+    if(!s)s=ts;
+    const t=Math.min((ts-s)/4000,1);
+    if(path.getPointAtLength){const pt=path.getPointAtLength(t*len);plane.setAttribute('x',pt.x);plane.setAttribute('y',pt.y+5)}
+    if(t<1)requestAnimationFrame(step);
+  };
+  setTimeout(()=>requestAnimationFrame(step),1500);
+}
+animPlane();
+
+/* ── COUNTDOWN ── */
+(function countdown(){
+  const target = new Date('2026-08-06T00:00:00-03:00');
+  function tick(){
+    const diff = target - Date.now();
+    if(diff<=0){
+      ['cd-d','cd-h','cd-m','cd-s'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
+      return;
+    }
+    const d=Math.floor(diff/864e5);
+    const h=Math.floor((diff%864e5)/36e5);
+    const m=Math.floor((diff%36e5)/6e4);
+    const s=Math.floor((diff%6e4)/1e3);
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=String(v).padStart(2,'0');};
+    set('cd-d',d); set('cd-h',h); set('cd-m',m); set('cd-s',s);
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// ── CHECKLIST ──
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  const box=el.querySelector('.check-box');
+  box.textContent=el.classList.contains('checked')?'✓':'';
+}
+
+// ── INITIAL REVEAL ──
+setTimeout(triggerReveal,150);
+</script>
+</body>
+</html>
